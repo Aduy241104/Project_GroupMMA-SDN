@@ -1,24 +1,20 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, View } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import MainTab from "./src/navigations/BottomTabNavigation";
 
 const Stack = createNativeStackNavigator();
-
-const TestComp = () => {
-  return (
-    <View>
-      <Text>HELLO WORLD</Text>
-    </View>
-  )
-}
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={TestComp}  />
+        <Stack.Screen
+          name="MainTab"
+          component={ MainTab }
+          options={ { headerShown: false } }
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
