@@ -5,10 +5,7 @@ import connectMongose from "./config/connectDatabase.js";
 import route from "./routes/index.js";
 import cookieParser from 'cookie-parser';
 
-
 const app = express();
-
-
 
 dotenv.config();
 
@@ -26,7 +23,6 @@ route(app);
 app.get("/test/heee2", (req, res) => {
     res.status(200).send({ message: "hello" })
 })
-
 
 
 const PORT = process.env.PORT || 8080;
