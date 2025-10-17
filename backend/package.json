@@ -23,6 +23,7 @@
     "mongodb": "5.5",
     "mongodb-schema": "^12.6.2",
     "mongoose": "^8.18.0",
+    "nodemailer": "^7.0.9",
     "pg": "^8.16.3"
   },
   "devDependencies": {
