@@ -18,8 +18,6 @@ app.use(cookieParser());
 app.use(morgan("combined"));
 route(app);
 
-
-
 app.get("/test/heee2", (req, res) => {
     res.status(200).send({ message: "hello" })
 })
