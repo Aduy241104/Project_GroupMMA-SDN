@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectMongose from "./config/connectDatabase.js";
 import route from "./routes/index.js";
 import cookieParser from 'cookie-parser';
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -16,8 +17,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(morgan("combined"));
-route(app);
 
+route(app);
+app.use(errorHandler);
 
 
 app.get("/test/heee2", (req, res) => {
