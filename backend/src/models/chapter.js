@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const chapterSchema = new mongoose.Schema({
-    storyId: { type: Schema.Types.ObjectId, ref: "Story", required: true },
+    storyId: { type: mongoose.Schema.Types.ObjectId, ref: "Story", required: true },
     chapterNumber: { type: Number, required: true },
     title: String,
     content: String, // cho tiểu thuyết

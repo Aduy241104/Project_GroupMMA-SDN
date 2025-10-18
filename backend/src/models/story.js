@@ -5,13 +5,15 @@ const storySchema = new mongoose.Schema({
     slug: { type: String, required: true, unique: true },
     description: String,
     coverImage: String,
-    authorId: { type: Schema.Types.ObjectId, ref: "Author" },
-    categoryIds: [{ type: Schema.Types.ObjectId, ref: "Category" }],
+    authorId: { type: mongoose.Schema.Types.ObjectId, ref: "Author" },
+    categoryIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
     type: { type: String, enum: ["novel", "comic"], required: true },
     status: { type: String, enum: ["ongoing", "completed", "paused"], default: "ongoing" },
     views: { type: Number, default: 0 },
     totalLikes: { type: Number, default: 0 },
-    createdBy: { type: Schema.Types.ObjectId, ref: "User" }
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
 }, { timestamps: true });
 
 const Story = mongoose.model("Story", storySchema);
+
+export default Story;
