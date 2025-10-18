@@ -1,12 +1,12 @@
 import Story from "../models/story.js";
-import { getMostViewedStories } from "../services/storiesServices.js";
+import { getAddRecently, getMostViewedStories, getUpdateRecently } from "../services/storiesServices.js";
+import { StatusCodes } from "http-status-codes";
 
 
 const getAllStory = async (req, res) => {
 
     try {
         const result = await Story.find();
-
         res.status(200).json(result);
     } catch (error) {
         console.log("💥ERROR: ", error);
@@ -18,14 +18,25 @@ const getAllStory = async (req, res) => {
 const getHomeData = async (req, res) => {
 
     try {
+        const mostViewedStories = await getMostViewedStories();
+        const updatedRecentlyStories = await getUpdateRecently();
+        const addedRecentlyStories = await getAddRecently();
 
-        const result = await getMostViewedStories();
+        const responseData = {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "Get main data successfully",
+            data: {
+                mostViewedStories: mostViewedStories,
+                updatedRecentlyStories: updatedRecentlyStories,
+                addedRecentlyStories: addedRecentlyStories
+            }
+        }
 
-        res.status(200).json(result);
-
+        res.status(StatusCodes.OK).json(responseData);
     } catch (error) {
         console.log("💥ERROR: ", error);
-        res.status(500)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR)
     }
 }
 
