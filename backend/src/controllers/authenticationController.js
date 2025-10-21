@@ -32,7 +32,7 @@ const login = async (req, res, next) => {
             return next(err); 
         }
 
-        const token = jwtUtil.generateToken({ id: user.id, email: user.email, role: user.role });
+        const token = jwtUtil.generateToken({ id: user._id, email: user.email, role: user.role });
         delete user.password;
 
         const responseData = {
