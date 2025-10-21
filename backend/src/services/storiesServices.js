@@ -40,3 +40,14 @@ export const getAddRecently = async (limit = 5) => {
 
     return data;
 }
+
+export const increaseStoryLike = async (storyId) => {
+    const data = await Story.findByIdAndUpdate(
+        storyId,
+        { $inc: { totalLikes: 1 } },
+        { new: true, runValidators: true }
+    ).select("title totalLikes");
+
+    return data;
+}
+

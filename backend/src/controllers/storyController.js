@@ -1,6 +1,7 @@
 import Story from "../models/story.js";
 import { getAddRecently, getMostViewedStories, getUpdateRecently } from "../services/storiesServices.js";
 import { StatusCodes } from "http-status-codes";
+import Author from "../models/author.js";
 
 
 const getAllStory = async (req, res) => {
@@ -41,7 +42,86 @@ const getHomeData = async (req, res) => {
 }
 
 
+const findStory = async (req, res, next) => {
+    const { type, keyword } = req.query;
+
+    try {
+
+        const query = {};
+        const normalizeKeyword = String(keyword).toLowerCase();
+
+        if (type === "title") {
+            query.title = { $regex: normalizeKeyword, $options: "i" };
+        } else if (type === "author") {
+            const authorObj = await Author.findOne({ name: { $regex: normalizeKeyword, $options: "i" } });
+
+            if (!authorObj) {
+                const err = new Error("Author not found");
+                err.statusCode = StatusCodes.NOT_FOUND;
+                return next(err)
+            }
+            query.authorId = authorObj._id;
+        }
+
+        const data = await Story.find(query)
+            .populate(
+                [
+                    { path: "authorId", select: "name" },
+                    { path: "categoryIds", select: "name" }
+                ]
+            )
+            .select("-createdBy -__v -createdAt");
+
+        const responseData = {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "Find story successfully",
+            data: {
+                stories: data
+            }
+        }
+        res.status(StatusCodes.OK).json(responseData);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const updateStoryView = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+
+        const story = await Story.findByIdAndUpdate(
+            id,
+            { $inc: { views: 1 } },
+            { new: true, runValidators: true }
+        ).select("title views");
+
+
+        if (!story) {
+            const err = new Error("Story not found");
+            err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err);
+        }
+
+
+        const responseData = {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "View updated successfully",
+            data: {
+                story: story
+            }
+        }
+
+        res.status(StatusCodes.OK).json(responseData);
+    } catch (error) {
+        next(error);
+    }
+}
+
 export default {
     getAllStory,
-    getHomeData
+    getHomeData,
+    findStory,
+    updateStoryView
 }
