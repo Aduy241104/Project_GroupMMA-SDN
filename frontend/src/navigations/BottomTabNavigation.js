@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text, FlatList, Image, StyleSheet, ScrollView } from "react-native";
+import { View, Text} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "../screens/HomeScreen";
 import DiscoverNavigation from "./DiscoverNavigation";
 import SearchNavigation from "./SearchNavigation";
 import MenuNavigation from "./MenuNavigation";
