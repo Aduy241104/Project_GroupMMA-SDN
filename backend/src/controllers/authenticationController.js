@@ -51,7 +51,7 @@ const login = async (req, res, next) => {
     }
 }
 
-// POST /logout - Đăng xuất: Check token header, response success (không blacklist, client xóa token)
+// POST /logout 
 const logout = async (req, res, next) => {
     try {
         // Lấy token từ header (Bearer token) để confirm auth
@@ -64,10 +64,8 @@ const logout = async (req, res, next) => {
 
         const token = authHeader.split(' ')[1];
 
-        // Optional: Verify token (không blacklist, chỉ check valid để response)
-        jwtUtil.verifyToken(token);  // Nếu invalid, throw error
+        jwtUtil.verifyToken(token);  
 
-        // Response success, FE sẽ xóa token local
         const responseData = {
             success: true,
             statusCode: StatusCodes.OK,

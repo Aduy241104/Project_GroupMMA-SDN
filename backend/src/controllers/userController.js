@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import OTP from "../models/otpVerify.js";
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -151,6 +152,54 @@ const verifyOTP = async (req, res) => {
     }
 };
 
+// POST /change-password - Thay đổi password (yêu cầu auth middleware để lấy user từ token)
+const changePassword = async (req, res) => {
+  try {
+    console.log('== changePassword called =='); // debug marker
+
+    const { oldPassword, newPassword } = req.body;
+    console.log('body:', { oldPassword: !!oldPassword, newPassword: !!newPassword });
+    console.log(oldPassword)
+    const userId = req.user && (req.user.id || req.user._id);
+    console.log('userId from req.user:', userId);
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Thiếu password cũ hoặc mới!' });
+    }
+
+    if (!PASSWORD_REGEX.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          'Password mới không hợp lệ! Phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.'
+      });
+    }
+
+    const user = await User.findById(userId);
+    console.log('found user:', !!user);
+    if (!user) {
+      return res.status(404).json({ message: 'User không tồn tại!' });
+    }
+
+    // kiểm tra chính xác: so sánh oldPassword với user.password
+    // const isMatch = await bcrypt.compare(oldPassword, user.password);
+    const isMatch = user.password === oldPassword;
+    console.log('bcrypt compare result:', isMatch);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Password cũ sai!' });
+    }
+
+    // const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+    // user.password = hashedNewPassword;
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Thay đổi password thành công! Hãy login lại để kiểm tra.' });
+  } catch (error) {
+    console.log('ERROR change password: ', error);
+    res.status(500).json({ message: 'Lỗi server khi thay đổi password!' });
+  }
+};
+
 export default {
-    getAll, register, verifyOTP 
+    getAll, register, verifyOTP, changePassword
 }
