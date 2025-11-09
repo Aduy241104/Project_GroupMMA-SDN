@@ -31,6 +31,8 @@ const getChapterContent = async (req, res, next) => {
     try {
 
         const data = await Chapter.findById(id).select("-__v -createdAt -updatedAt");
+        console.log("TEST DATA: ", data);
+
         if (!data) {
             const err = new Error("Chapter not found");
             err.statusCode = StatusCodes.NOT_FOUND;

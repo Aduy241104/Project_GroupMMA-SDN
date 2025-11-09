@@ -1,25 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text, FlatList, Image, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "../screens/HomeScreen";
 import DiscoverNavigation from "./DiscoverNavigation";
 import SearchNavigation from "./SearchNavigation";
 import MenuNavigation from "./MenuNavigation";
 import AdminNavigation from "./AdminNavigation";
 
 const Tab = createBottomTabNavigator();
-
-const ProfileScreen = () => (
-    <View style={ { flex: 1, justifyContent: "center", alignItems: "center" } }>
-        <Text>👤 Profile Screen</Text>
-    </View>
-);
-
-const SettingsScreen = () => (
-    <View style={ { flex: 1, justifyContent: "center", alignItems: "center" } }>
-        <Text>⚙️ Settings Screen</Text>
-    </View>
-);
 
 // --- Tạo Bottom Tab ---
 function MainTab() {

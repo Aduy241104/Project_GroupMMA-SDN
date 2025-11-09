@@ -152,5 +152,5 @@ const verifyOTP = async (req, res) => {
 };
 
 export default {
-    getAll, register, verifyOTP
+    getAll, register, verifyOTP 
 }

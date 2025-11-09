@@ -1,13 +1,17 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, View } from "react-native";
+import { View, Text, Button } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
 
-const Temp = () => {
+const Temp = ({ navigation }) => {
     return (
         <View>
-            <Text>Lam thi xoa component nay</Text>
+            <Text>Làm thì xóa component này</Text>
+            <Button
+                title="Đi đến Login"
+                onPress={ () => navigation.navigate('Login') }
+            />
         </View>
     )
 }

@@ -8,7 +8,7 @@ import { verifyAdmin, verifyTokenMiddleware } from "../middlewares/authMiddlewar
 
 function route(app) {
 
-    app.use("/api/test", verifyTokenMiddleware, verifyAdmin, userController.getAll);
+    app.use("/api/test", userController.getAll);
     app.use("/auth", authRoute);
 
     // app.post("/api/auth/register", userController.register);
