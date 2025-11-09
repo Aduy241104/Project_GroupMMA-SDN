@@ -4,26 +4,29 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MainTab from "./src/navigations/BottomTabNavigation";
 import { AuthProvider } from "./src/context/AuthContext";
 import React, { useEffect } from "react";
+import LoginScreen from "./src/screens/LoginScreen";
+import StoryDetailScreen from "./src/screens/StoryDetailScreen";
+import ReadStoryScreen from "./src/screens/ReadStoryScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
 
-  useEffect(() => {
-    const testApi = async () => {
-      try {
-        const response = await fetch("http://172.20.10.2:8080/api/test");
-        // ⚠️ Đổi 192.168.1.5 thành IP máy tính bạn đang chạy backend (xem dưới)
-        const data = await response.json();
-        console.log("✅ API response:", data);
-      } catch (error) {
-        console.log("❌ API error:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const testApi = async () => {
+  //     try {
+  //       const response = await fetch("http://172.20.10.2:8080/api/test");
+  //       // ⚠️ Đổi 192.168.1.5 thành IP máy tính bạn đang chạy backend (xem dưới)
+  //       const data = await response.json();
+  //       console.log("✅ API response:", data);
+  //     } catch (error) {
+  //       console.log("❌ API error:", error);
+  //     }
+  //   };
 
-    testApi();
-  }, []);
+  //   testApi();
+  // }, []);
 
 
   return (
@@ -35,6 +38,9 @@ export default function App() {
             component={ MainTab }
             options={ { headerShown: false } }
           />
+          <Stack.Screen name="Login" component={ LoginScreen } />
+          <Stack.Screen name="detail" component={ StoryDetailScreen } />
+          <Stack.Screen name="read" component={ ReadStoryScreen } />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

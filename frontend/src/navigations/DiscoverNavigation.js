@@ -1,21 +1,14 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, View } from "react-native";
+import HomeScreen from "../screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
-
-
-const Temp = () => {
-    return (
-        <View>
-            <Text>Lam thi xoa component nay</Text>
-        </View>
-    )
-}
 
 const DiscoverNavigation = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="main discover" component={ Temp } />
+            <Stack.Screen  name="main discover" component={ HomeScreen } />
+            <Stack.Screen name="favorite" component={ HomeScreen } />
         </Stack.Navigator>
     )
 }

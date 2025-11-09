@@ -1,6 +1,8 @@
 import axios from "axios";
 import { HOST } from "@env";
 
+console.log("HOSST: ", HOST);
+
 // Tạo instance riêng
 const api = axios.create({
     baseURL: HOST,
@@ -15,7 +17,7 @@ api.interceptors.request.use(
     async (config) => {
         // Ví dụ token lưu trong AsyncStorage (React Native)
         // hoặc localStorage (ReactJS)
-        const token = null; 
+        const token = null;
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
