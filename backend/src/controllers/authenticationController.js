@@ -51,6 +51,35 @@ const login = async (req, res, next) => {
     }
 }
 
+// POST /logout - Đăng xuất: Check token header, response success (không blacklist, client xóa token)
+const logout = async (req, res, next) => {
+    try {
+        // Lấy token từ header (Bearer token) để confirm auth
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            const err = new Error("No token provided!");
+            err.statusCode = StatusCodes.UNAUTHORIZED;
+            return next(err);
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        // Optional: Verify token (không blacklist, chỉ check valid để response)
+        jwtUtil.verifyToken(token);  // Nếu invalid, throw error
+
+        // Response success, FE sẽ xóa token local
+        const responseData = {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "Logout successful! Tạm biệt, hẹn gặp lại với những câu chuyện truyện tranh hay hơn."
+        };
+
+        res.status(StatusCodes.OK).json(responseData);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
-    login, 
+    login, logout
 }
