@@ -4,6 +4,7 @@ import storyRoute from "./story.route.js";
 import userRouter from './user.route.js';
 import chapterRouter from "./chapter.route.js";
 import likeRouter from "./like.route.js";
+import readingHistoryRouter from "./history.route.js";
 import { verifyAdmin, verifyTokenMiddleware } from "../middlewares/authMiddleware.js";
 
 function route(app) {
@@ -16,6 +17,7 @@ function route(app) {
     app.use("/api/stories", storyRoute);
     app.use("/api/chapters", chapterRouter);
     app.use("/api/like", likeRouter);
+    app.use("/api/history", readingHistoryRouter)
 
 }
 
