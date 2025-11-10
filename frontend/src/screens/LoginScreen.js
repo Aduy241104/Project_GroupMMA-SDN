@@ -85,6 +85,10 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity onPress={ () => navigation.navigate("register") }>
                 <Text style={ styles.registerText }>Chưa có tài khoản? Đăng ký ngay</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity onPress={ () => navigation.navigate("forgot-password") }>
+                <Text style={ styles.registerText }>Quên mật khẩu</Text>
+            </TouchableOpacity>
         </View>
     );
 };
