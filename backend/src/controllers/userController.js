@@ -310,6 +310,32 @@ const updateProfile = async (req, res) => {
     }
 };
 
+// GET /profile - Xem thông tin cá nhân (yêu cầu middleware auth)
+const viewProfile = async (req, res) => {
+    try {
+        const userId = req.user && (req.user.id || req.user._id);
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Không tìm thấy user! Vui lòng đăng nhập lại.' });
+        }
+
+        // Lấy thông tin user, ẩn password và các trường không cần thiết
+        const user = await User.findById(userId).select('-password -__v -createdAt -updatedAt');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User không tồn tại!' });
+        }
+
+        res.status(200).json({
+            message: 'Lấy thông tin profile thành công!',
+            user
+        });
+    } catch (error) {
+        console.log("ERROR view profile: ", error);
+        res.status(500).json({ message: 'Lỗi server khi lấy thông tin profile!' });
+    }
+};
+
 export default {
-    getAll, register, verifyOTP, changePassword, forgotPassword, resetPassword, updateProfile
+    getAll, register, verifyOTP, changePassword, forgotPassword, resetPassword, updateProfile, viewProfile
 }

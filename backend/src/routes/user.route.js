@@ -10,5 +10,6 @@ router.post('/change-password', verifyTokenMiddleware, userController.changePass
 router.post ('/forgot-password', userController.forgotPassword)
 router.post ('/reset-password', userController.resetPassword)
 router.put('/update-profile', verifyTokenMiddleware, userController.updateProfile)
+router.get('/profile', verifyTokenMiddleware, userController.viewProfile)
 
 export default router; 
