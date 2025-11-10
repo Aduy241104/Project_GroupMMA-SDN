@@ -99,15 +99,6 @@ const ProfileScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Chỉnh sửa hồ sơ</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#f44336' }]}
-        onPress={async () => {
-          await AsyncStorage.removeItem('token');
-          navigation.navigate('login');
-        }}
-      >
-        <Text style={styles.buttonText}>Đăng xuất</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };

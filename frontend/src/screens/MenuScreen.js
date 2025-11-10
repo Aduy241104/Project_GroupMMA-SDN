@@ -57,7 +57,14 @@ function MenuScreen({ navigation }) {
             <TouchableOpacity onPress={handleManageProfile}>
               <View style={styles.profileRow}>
                 <View style={styles.avatar}>
-                  <Image source = {{ uri: user.avatarUrl }}/>
+                  <Image
+                    source={{
+                      uri:
+                        user.avatarUrl ||
+                        "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                    }}
+                    style={styles.avatarImage} // ✅ Thêm dòng này
+                  />
                 </View>
                 <View>
                   <Text style={styles.username}>{user.username}</Text>
@@ -108,6 +115,10 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     fontWeight: "600",
   },
+  avatarImage: {  // ✅ Thêm style mới này
+    width: 50,
+    height: 50,
+  },
   profileSection: {
     backgroundColor: "#111",
     borderRadius: 10,
@@ -127,6 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
+    overflow: "hidden",
   },
   avatarText: {
     color: "#fff",
