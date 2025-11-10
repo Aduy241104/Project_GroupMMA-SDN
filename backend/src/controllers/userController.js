@@ -269,6 +269,47 @@ const resetPassword = async (req, res) => {
     }
 };
 
+// PUT /update-profile - Cập nhật profile: username, avatarUrl, bio (yêu cầu auth middleware để lấy user từ token)
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user && (req.user.id || req.user._id);
+        const { username, avatarUrl, bio } = req.body;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Không tìm thấy user! Vui lòng đăng nhập lại.' });
+        }
+
+        if (!username && !avatarUrl && bio === undefined) {
+            return res.status(400).json({ message: 'Không có thông tin nào để cập nhật!' });
+        }
+
+        const updateFields = {};
+        if (username) {
+            const existingUser = await User.findOne({ username });
+            if (existingUser && existingUser._id.toString() !== userId.toString()) {
+                return res.status(400).json({ message: 'Username đã tồn tại! Chọn username khác.' });
+            }
+            updateFields.username = username;
+        }
+        if (avatarUrl) updateFields.avatarUrl = avatarUrl;
+        if (bio !== undefined) updateFields.bio = bio; // Cho phép bio rỗng để xóa
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true }).select('-password -__v -createdAt -updatedAt');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User không tồn tại!' });
+        }
+
+        res.status(200).json({
+            message: 'Cập nhật profile thành công! Hãy refresh app để xem thay đổi.',
+            user: updatedUser
+        });
+    } catch (error) {
+        console.log("ERROR update profile: ", error);
+        res.status(500).json({ message: 'Lỗi server khi cập nhật profile!' });
+    }
+};
+
 export default {
-    getAll, register, verifyOTP, changePassword, forgotPassword, resetPassword
+    getAll, register, verifyOTP, changePassword, forgotPassword, resetPassword, updateProfile
 }

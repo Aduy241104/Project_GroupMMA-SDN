@@ -9,5 +9,6 @@ router.post('/verify-otp', userController.verifyOTP);
 router.post('/change-password', verifyTokenMiddleware, userController.changePassword)
 router.post ('/forgot-password', userController.forgotPassword)
 router.post ('/reset-password', userController.resetPassword)
+router.put('/update-profile', verifyTokenMiddleware, userController.updateProfile)
 
 export default router; 
