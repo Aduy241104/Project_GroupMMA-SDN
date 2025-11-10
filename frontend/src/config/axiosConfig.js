@@ -2,6 +2,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HOST } from "@env";
 
+
+
 console.log("HOST: ", HOST);
 
 // Tạo instance riêng

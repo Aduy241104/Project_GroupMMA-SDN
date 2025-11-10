@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, TextInput, FlatList } from 'react-native';
 import api from '../config/axiosConfig'; // ✅ import axios instance của bạn
 import ActionButtons from '../components/ActionsButtons';
 import { useIsFocused } from '@react-navigation/native';
@@ -11,6 +11,10 @@ function StoryDetailScreen({ route, navigation }) {
     const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [loadingComments, setLoadingComments] = useState(true);
+    const [commentText, setCommentText] = useState("");
+    const [postingComment, setPostingComment] = useState(false);
     const isFocus = useIsFocused();
 
     useEffect(() => {
@@ -52,6 +56,28 @@ function StoryDetailScreen({ route, navigation }) {
         fetchChaptersAndLike();
     }, [data._id, isFocus]);
 
+    // Fetch comments for this story
+    useEffect(() => {
+        const fetchComments = async () => {
+            setLoadingComments(true);
+            try {
+                const res = await api.get(`/api/comments/story/${data._id}`);
+                if (res?.success && res.data?.comments) {
+                    setComments(res.data.comments);
+                } else {
+                    setComments([]);
+                }
+            } catch (err) {
+                console.error("Error fetching comments:", err);
+                setComments([]);
+            } finally {
+                setLoadingComments(false);
+            }
+        };
+
+        fetchComments();
+    }, [data._id, isFocus]);
+
 
     const handleLikeToggle = async () => {
 
@@ -76,6 +102,31 @@ function StoryDetailScreen({ route, navigation }) {
         }
     };
 
+    const handleSubmitComment = async () => {
+        if (!token) {
+            Alert.alert("Thông báo", "Bạn cần đăng nhập để bình luận");
+            return;
+        }
+
+        if (!commentText.trim()) return;
+
+        setPostingComment(true);
+        try {
+            const res = await api.post(`/api/comments`, { storyId: data._id, content: commentText.trim() });
+            if (res?.success) {
+                // backend create returns comment without populated user, so refetch list
+                setCommentText("");
+                const refreshed = await api.get(`/api/comments/story/${data._id}`);
+                if (refreshed?.success && refreshed.data?.comments) setComments(refreshed.data.comments);
+            }
+        } catch (err) {
+            console.error("Lỗi khi gửi bình luận:", err);
+            Alert.alert("Lỗi", "Không thể gửi bình luận. Vui lòng thử lại.");
+        } finally {
+            setPostingComment(false);
+        }
+    };
+
     return (
         <View style={ { flex: 1, backgroundColor: "#000" } }>
             <ScrollView
@@ -86,7 +137,17 @@ function StoryDetailScreen({ route, navigation }) {
                 <Text style={ styles.title }>{ data.title }</Text>
 
                 {/* Tác giả */ }
-                <Text style={ styles.author }>Tác giả: { data.authorId?.name }</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    {data.authorId?.avatarUrl ? (
+                        <Image source={{ uri: data.authorId.avatarUrl }} style={{ width: 48, height: 48, borderRadius: 24, marginRight: 10 }} />
+                    ) : null}
+                    <View style={{ flex: 1 }}>
+                        <Text style={ styles.author }>Tác giả: { data.authorId?.name }</Text>
+                        {data.authorId?.bio ? (
+                            <Text style={{ color: '#888', fontSize: 12 }}>{data.authorId.bio}</Text>
+                        ) : null}
+                    </View>
+                </View>
 
                 {/* Ảnh bìa */ }
                 <Image source={ { uri: data.coverImage } } style={ styles.coverImage } />
@@ -138,6 +199,47 @@ function StoryDetailScreen({ route, navigation }) {
                 ) : (
                     <Text style={ { color: "#aaa", fontStyle: "italic" } }>Chưa có chương nào.</Text>
                 ) }
+
+                {/* Bình luận */}
+                <Text style={ styles.sectionTitle }>Bình luận</Text>
+
+                {/* Form gửi bình luận (hiện nếu có token) */}
+                <View style={{ marginBottom: 12 }}>
+                    <TextInput
+                        value={commentText}
+                        onChangeText={setCommentText}
+                        placeholder="Viết bình luận..."
+                        placeholderTextColor="#777"
+                        style={styles.commentInput}
+                        multiline
+                    />
+                    <TouchableOpacity
+                        style={[styles.commentButton, postingComment ? { opacity: 0.6 } : null]}
+                        onPress={handleSubmitComment}
+                        disabled={postingComment}
+                    >
+                        <Text style={styles.buttonText}>{postingComment ? 'Đang gửi...' : 'Gửi'}</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Danh sách bình luận */}
+                {loadingComments ? (
+                    <ActivityIndicator size="small" color="#fff" style={{ marginTop: 8 }} />
+                ) : comments.length === 0 ? (
+                    <Text style={{ color: '#aaa', fontStyle: 'italic' }}>Chưa có bình luận.</Text>
+                ) : (
+                    <FlatList
+                        data={comments}
+                        keyExtractor={(item) => item._id}
+                        renderItem={({ item }) => (
+                            <View style={styles.commentItem}>
+                                <Text style={styles.commentAuthor}>{item.userId?.name ?? 'Người dùng'}</Text>
+                                <Text style={styles.commentContent}>{item.content}</Text>
+                                <Text style={styles.commentTime}>{new Date(item.createdAt).toLocaleString()}</Text>
+                            </View>
+                        )}
+                    />
+                )}
             </ScrollView>
 
             {/* Nút hành động cố định ở dưới */ }
@@ -256,5 +358,41 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '600',
+    },
+    commentInput: {
+        backgroundColor: '#111',
+        color: '#fff',
+        padding: 10,
+        borderRadius: 8,
+        minHeight: 44,
+        textAlignVertical: 'top',
+    },
+    commentButton: {
+        marginTop: 8,
+        alignSelf: 'flex-end',
+        backgroundColor: '#007bff',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    commentItem: {
+        backgroundColor: '#0b0b0b',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 8,
+    },
+    commentAuthor: {
+        color: '#fff',
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    commentContent: {
+        color: '#ddd',
+        marginBottom: 6,
+    },
+    commentTime: {
+        color: '#777',
+        fontSize: 12,
+        textAlign: 'right',
     },
 });
