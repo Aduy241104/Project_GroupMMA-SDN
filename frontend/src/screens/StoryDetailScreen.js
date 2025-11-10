@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import api from '../config/axiosConfig'; // ✅ import axios instance của bạn
+import ActionButtons from '../components/ActionsButtons';
 
 function StoryDetailScreen({ route, navigation }) {
     const { data } = route.params;
@@ -12,7 +13,7 @@ function StoryDetailScreen({ route, navigation }) {
             try {
                 const res = await api.get(`/api/chapters/${data._id}`);
                 const result = res;
-                
+
                 if (result.success && result.data?.chapters) {
                     const sortedChapters = result.data.chapters.sort(
                         (a, b) => a.chapterNumber - b.chapterNumber
@@ -20,11 +21,11 @@ function StoryDetailScreen({ route, navigation }) {
 
                     // console.log("SPRRT: ", sortedChapters);
                     // console.log("result.data.chapters", result.data.chapters);
-                    
+
                     setChapters(sortedChapters);
                 } else {
-                    console.log("HELLO");
-                    
+                    // console.log("HELLO");
+
                     setChapters([]);
                 }
             } catch (err) {
@@ -74,6 +75,8 @@ function StoryDetailScreen({ route, navigation }) {
                     <Text style={ [styles.infoText, { marginLeft: 10 }] }>Lượt thích:</Text>
                     <Text style={ styles.normalText }>{ data.totalLikes }</Text>
                 </View>
+
+                <ActionButtons />
 
                 {/* Mô tả */ }
                 <Text style={ styles.sectionTitle }>Giới thiệu</Text>
