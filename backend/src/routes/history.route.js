@@ -8,5 +8,7 @@ router.get("/", verifyTokenMiddleware, readingHistoryController.getUserHistory);
 
 router.post("/update-history/:storyId", verifyTokenMiddleware, readingHistoryController.addOrUpdateHistory);
 
+router.delete("/delete/:id", verifyTokenMiddleware, readingHistoryController.deleteHistory)
+
 
 export default router;
