@@ -34,6 +34,11 @@ export const AuthProvider = ({ children }) => {
     const login = async (userData, tokenValue) => {
         setUser(userData);
         setToken(tokenValue);
+
+        console.log("❤️‍🔥USER DATA: ", userData);
+        console.log("👌TOKEN: ", tokenValue);
+
+
         await AsyncStorage.setItem("user", JSON.stringify(userData));
         await AsyncStorage.setItem("token", tokenValue);
     };
