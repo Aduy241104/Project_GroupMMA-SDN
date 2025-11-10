@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.JWT_SECRET;
+
 
 
 export const verifyTokenMiddleware = (req, res, next) => {
+    const SECRET_KEY = process.env.JWT_SECRET;
     const authHeader = req.headers["authorization"];
 
     const token = authHeader && authHeader.split(" ")[1];
