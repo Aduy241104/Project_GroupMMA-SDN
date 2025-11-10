@@ -28,42 +28,37 @@ const getAll = async (req, res) => {
 }
 
 // Hàm generate OTP 6 chữ số và gửi email (giữ nguyên)
-const generateAndSendOTP = async (userId, email) => {
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 chữ số random
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // Hết hạn sau 10 phút
+const generateAndSendOTP = async (userId, email, subject, htmlTemplate) => {
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Lưu OTP vào DB (xóa OTP cũ nếu có)
     await OTP.deleteMany({ email });
-    const newOTP = new OTP({
+
+    await new OTP({
         userId,
         email,
         otpCode,
         expiresAt,
         verified: false
-    });
-    await newOTP.save();
+    }).save();
 
-    // Gửi email
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: 'Xác thực email - App Đọc Truyện Tranh',
-        html: `
-            <h2>Xin chào!</h2>
-            <p>Mã OTP xác thực email của bạn là: <strong>${otpCode}</strong></p>
-            <p>Mã này hết hạn sau 10 phút. Nếu bạn không yêu cầu, hãy bỏ qua.</p>
-            <p>Cảm ơn bạn đã đăng ký app đọc truyện tranh!</p>
-        `
+        subject: subject || 'Xác thực email - App Đọc Truyện Tranh',
+        html: htmlTemplate
+            ? htmlTemplate(otpCode)
+            : `
+                <h2>Xin chào!</h2>
+                <p>Mã OTP xác thực email của bạn là: <strong>${otpCode}</strong></p>
+                <p>Mã này hết hạn sau 10 phút. Nếu bạn không yêu cầu, hãy bỏ qua.</p>
+                <p>Cảm ơn bạn đã đăng ký app đọc truyện tranh!</p>
+            `
     };
 
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`OTP gửi thành công đến ${email}`);
-    } catch (error) {
-        console.error('Lỗi gửi email:', error);
-        throw new Error('Không thể gửi OTP!');
-    }
-};
+    await transporter.sendMail(mailOptions);
+}
+
 
 // POST /register - Cập nhật: Set isActive: false sau đăng ký, gửi OTP
 const register = async (req, res) => {
@@ -155,13 +150,8 @@ const verifyOTP = async (req, res) => {
 // POST /change-password - Thay đổi password (yêu cầu auth middleware để lấy user từ token)
 const changePassword = async (req, res) => {
   try {
-    console.log('== changePassword called =='); // debug marker
-
     const { oldPassword, newPassword } = req.body;
-    console.log('body:', { oldPassword: !!oldPassword, newPassword: !!newPassword });
-    console.log(oldPassword)
     const userId = req.user && (req.user.id || req.user._id);
-    console.log('userId from req.user:', userId);
 
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ message: 'Thiếu password cũ hoặc mới!' });
@@ -175,7 +165,6 @@ const changePassword = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    console.log('found user:', !!user);
     if (!user) {
       return res.status(404).json({ message: 'User không tồn tại!' });
     }
@@ -183,7 +172,6 @@ const changePassword = async (req, res) => {
     // kiểm tra chính xác: so sánh oldPassword với user.password
     // const isMatch = await bcrypt.compare(oldPassword, user.password);
     const isMatch = user.password === oldPassword;
-    console.log('bcrypt compare result:', isMatch);
     if (!isMatch) {
       return res.status(401).json({ message: 'Password cũ sai!' });
     }
@@ -200,6 +188,87 @@ const changePassword = async (req, res) => {
   }
 };
 
+// POST /forgot-password - Quên password: Gửi OTP reset đến email
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: 'Thiếu email!' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'Email không tồn tại!' });
+        }
+
+        // Gửi OTP reset (tái sử dụng generateAndSendOTP, tùy chỉnh subject/html)
+        await generateAndSendOTP(
+            user._id,
+            email,
+            'Reset Password - App Đọc Truyện Tranh',
+            (otpCode) => `
+                <h2>Xin chào!</h2>
+                <p>Bạn đã yêu cầu reset password. Mã OTP của bạn là: <strong>${otpCode}</strong></p>
+                <p>Mã này hết hạn sau 10 phút. Nếu bạn không yêu cầu, hãy bỏ qua để tránh mất tài khoản đọc truyện tranh yêu thích.</p>
+                <p>Cảm ơn bạn!</p>
+            `
+   
+        );
+
+        res.status(200).json({ message: 'OTP reset password đã gửi đến email! Kiểm tra và reset ngay.' });
+    } catch (error) {
+        console.log("ERROR forgot password: ", error);
+        res.status(500).json({ message: 'Lỗi server khi gửi OTP reset!' });
+    }
+};
+
+// POST /reset-password - Reset password với OTP và newPassword
+const resetPassword = async (req, res) => {
+    try {
+        const { email, otpCode, newPassword } = req.body;
+
+        if (!email || !otpCode || !newPassword) {
+            return res.status(400).json({ message: 'Thiếu email, OTP hoặc password mới!' });
+        }
+
+        if (!PASSWORD_REGEX.test(newPassword)) {
+            return res.status(400).json({ 
+                message: 'Password mới không hợp lệ! Phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.' 
+            });
+        }
+
+        // Check OTP
+        const otp = await OTP.findOne({ email, otpCode, verified: false });
+        if (!otp) {
+            return res.status(400).json({ message: 'OTP không hợp lệ hoặc đã sử dụng!' });
+        }
+
+        if (otp.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'OTP đã hết hạn! Yêu cầu gửi lại.' });
+        }
+
+        // Update password
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User không tồn tại!' });
+        }
+
+        // const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+        user.password = newPassword;
+        await user.save();
+
+        // Mark OTP verified
+        otp.verified = true;
+        await otp.save();
+
+        res.status(200).json({ message: 'Reset password thành công! Hãy login với password mới để tiếp tục đọc truyện tranh.' });
+    } catch (error) {
+        console.log("ERROR reset password: ", error);
+        res.status(500).json({ message: 'Lỗi server khi reset password!' });
+    }
+};
+
 export default {
-    getAll, register, verifyOTP, changePassword
+    getAll, register, verifyOTP, changePassword, forgotPassword, resetPassword
 }
