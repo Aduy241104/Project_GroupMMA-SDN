@@ -10,9 +10,11 @@ import {
     StyleSheet,
 } from "react-native";
 import api from "../config/axiosConfig"; // 🔹 import instance axios bạn đã cấu hình
+import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {
     const [data, setData] = useState(null);
+    const isFocus = useIsFocused();
 
     useEffect(() => {
         const fetchHomeData = async () => {
@@ -25,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
         };
 
         fetchHomeData();
-    }, []);
+    }, [isFocus]);
 
     const renderStoryItem = ({ item }) => (
         <TouchableOpacity style={ styles.storyCard } onPress={ () => navigation.navigate("detail", { data: item }) }>

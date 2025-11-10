@@ -40,7 +40,25 @@ const unlikeStory = async (req, res, next) => {
     }
 }
 
+const checkLiked = async (req, res) => {
+    const user = req.user;
+    const { storyId } = req.params;
+    try {
+
+        const isLiked = await Like.exists({ storyId: storyId, userId: user.id });
+
+        if (isLiked) {
+            return res.status(200).json({ isLiked: true })
+        }
+        res.status(200).json({ isLiked: false })
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 export default {
     likeStory,
-    unlikeStory
+    unlikeStory,
+    checkLiked
 }
