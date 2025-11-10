@@ -1,6 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from 'react-native';
 import MenuScreen from "../screens/MenuScreen";
+import Profile from '../screens/Profile'
+import UpdateProfileScreen from "../screens/UpdateProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +23,8 @@ const MenuNavigation = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Main Menu" component={ MenuScreen } />
+            <Stack.Screen name="profile" component={ Profile } />
+            <Stack.Screen name="update-profile" component={ UpdateProfileScreen } />
         </Stack.Navigator>
     )
 }
