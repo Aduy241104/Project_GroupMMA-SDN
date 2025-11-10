@@ -13,7 +13,7 @@ function ReadStoryScreen({ route }) {
             try {
                 const res = await api.get(`/api/chapters/chapter-detail/${chapter._id}`);
                 const result = res;
-                console.log("CHAPTER DETAIL:", result);
+                // console.log("CHAPTER DETAIL:", result);
 
                 if (result.success && result.data?.chapterDetail) {
                     setChapterDetail(result.data.chapterDetail);
