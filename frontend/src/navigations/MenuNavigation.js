@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from 'react-native';
+import MenuScreen from "../screens/MenuScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,7 +20,7 @@ const Temp = ({ navigation }) => {
 const MenuNavigation = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Main Menu" component={ Temp } />
+            <Stack.Screen name="Main Menu" component={ MenuScreen } />
         </Stack.Navigator>
     )
 }

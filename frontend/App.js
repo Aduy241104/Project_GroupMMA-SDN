@@ -38,7 +38,7 @@ export default function App() {
             component={ MainTab }
             options={ { headerShown: false } }
           />
-          <Stack.Screen name="Login" component={ LoginScreen } />
+          <Stack.Screen name="login" component={ LoginScreen } />
           <Stack.Screen name="detail" component={ StoryDetailScreen } />
           <Stack.Screen name="read" component={ ReadStoryScreen } />
         </Stack.Navigator>

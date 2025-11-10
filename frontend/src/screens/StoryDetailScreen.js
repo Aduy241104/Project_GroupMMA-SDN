@@ -1,42 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import api from '../config/axiosConfig'; // ✅ import axios instance của bạn
+import ActionButtons from '../components/ActionsButtons';
+import { useIsFocused } from '@react-navigation/native';
+import { AuthContext } from "../context/AuthContext";
 
 function StoryDetailScreen({ route, navigation }) {
     const { data } = route.params;
+    const { token } = useContext(AuthContext);
     const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isLiked, setIsLiked] = useState(false);
+    const isFocus = useIsFocused();
 
     useEffect(() => {
-        const fetchChapters = async () => {
+        const fetchChaptersAndLike = async () => {
+            setLoading(true);
             try {
-                const res = await api.get(`/api/chapters/${data._id}`);
-                const result = res;
-                
+                // 1. Lấy chapters
+                const resChapters = await api.get(`/api/chapters/${data._id}`);
+                const result = resChapters;
+
                 if (result.success && result.data?.chapters) {
                     const sortedChapters = result.data.chapters.sort(
                         (a, b) => a.chapterNumber - b.chapterNumber
                     );
-
-                    // console.log("SPRRT: ", sortedChapters);
-                    // console.log("result.data.chapters", result.data.chapters);
-                    
                     setChapters(sortedChapters);
                 } else {
-                    console.log("HELLO");
-                    
                     setChapters([]);
                 }
+
+                // 2. Kiểm tra like
+                if (token) {
+                    const resLike = await api.get(`/api/like/check-liked/${data._id}`);
+                    if (resLike?.isLiked !== undefined) {
+                        setIsLiked(resLike.isLiked);
+                    } else {
+                        setIsLiked(false);
+                    }
+                }
+
             } catch (err) {
-                console.error("Fetch chapters error:", err);
+                console.error("Error fetching chapters or like status:", err);
                 setChapters([]);
+                setIsLiked(false);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchChapters();
-    }, [data._id]);
+        fetchChaptersAndLike();
+    }, [data._id, isFocus]);
+
+
+    const handleLikeToggle = async () => {
+
+        if (!token) {
+            Alert.alert("Thông báo", "Bạn cần đăng nhập để like truyện");
+            return;
+        }
+
+        try {
+            if (isLiked) {
+                // Nếu đã like, gọi API unlike
+                await api.delete(`/api/like/user-unlike/${data._id}`);
+                setIsLiked(false);
+            } else {
+                // Nếu chưa like, gọi API like
+                await api.post(`/api/like/user-like/${data._id}`);
+                setIsLiked(true);
+            }
+        } catch (err) {
+            console.error("Lỗi khi like/unlike story:", err);
+            Alert.alert("Lỗi", "Không thể thực hiện thao tác. Vui lòng thử lại.");
+        }
+    };
 
     return (
         <View style={ { flex: 1, backgroundColor: "#000" } }>
@@ -74,6 +112,8 @@ function StoryDetailScreen({ route, navigation }) {
                     <Text style={ [styles.infoText, { marginLeft: 10 }] }>Lượt thích:</Text>
                     <Text style={ styles.normalText }>{ data.totalLikes }</Text>
                 </View>
+
+                <ActionButtons liked={ isLiked } onLike={ handleLikeToggle } />
 
                 {/* Mô tả */ }
                 <Text style={ styles.sectionTitle }>Giới thiệu</Text>

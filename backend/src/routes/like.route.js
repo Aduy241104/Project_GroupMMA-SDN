@@ -8,4 +8,6 @@ router.post("/user-like/:storyId", verifyTokenMiddleware, likeController.likeSto
 
 router.delete("/user-unlike/:storyId", verifyTokenMiddleware, likeController.unlikeStory);
 
+router.get("/check-liked/:storyId", verifyTokenMiddleware, likeController.checkLiked);
+
 export default router;
