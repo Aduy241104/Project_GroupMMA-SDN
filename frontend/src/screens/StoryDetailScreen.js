@@ -15,19 +15,19 @@ function StoryDetailScreen({ route, navigation }) {
     const isFocus = useIsFocused();
 
     useEffect(() => {
+        if (token) {
+            const handleSaveHistory = async () => {
+                try {
+                    await api.post(`/api/history/update-history/${data._id}`)
+                    console.log("Save history");
 
-        const handleSaveHistory = async () => {
-            try {
-                await api.post(`/api/history/update-history/${data._id}`)
-                console.log("Save history");
-
-            } catch (error) {
-                console.log(error);
+                } catch (error) {
+                    console.log(error);
+                }
             }
+            handleSaveHistory();
         }
-
-        handleSaveHistory();
-    }, [data._id])
+    }, [data._id]);
 
     useEffect(() => {
         const fetchChaptersAndLike = async () => {
@@ -39,9 +39,9 @@ function StoryDetailScreen({ route, navigation }) {
 
                 if (result.success && result.data?.chapters) {
                     const sortedChapters = result.data.chapters.sort(
-                        (a, b) => a.chapterNumber - b.chapterNumber
+                        (a, b) => b.chapterNumber - a.chapterNumber
                     );
-                    setChapters(sortedChapters);
+                    setChapters(sortedChapters || []);
                 } else {
                     setChapters([]);
                 }
@@ -58,7 +58,7 @@ function StoryDetailScreen({ route, navigation }) {
 
             } catch (err) {
                 console.error("Error fetching chapters or like status:", err);
-                setChapters([]);
+                // setChapters([]);
                 setIsLiked(false);
             } finally {
                 setLoading(false);
@@ -168,7 +168,6 @@ function StoryDetailScreen({ route, navigation }) {
             </View>
         </View>
     );
-
 }
 
 export default StoryDetailScreen;

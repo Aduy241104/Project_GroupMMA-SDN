@@ -9,7 +9,7 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
-import api from "../config/axiosConfig"; // 🔹 import instance axios bạn đã cấu hình
+import api from "../config/axiosConfig";
 import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {

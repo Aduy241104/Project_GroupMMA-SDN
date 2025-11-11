@@ -37,6 +37,15 @@ function MenuScreen({ navigation }) {
     ]);
   };
 
+
+  const handleViewHistory = () => {
+    if (!user) {
+      Alert.alert("Thông báo", "Bạn cần đăng nhập để xem lịch sử");
+      return;
+    }
+    navigation.navigate("history")
+  }
+
   const renderMenuItem = (icon, text, onPress) => (
     <TouchableOpacity style={ styles.menuItem } onPress={ onPress }>
       <View style={ styles.iconText }>
@@ -88,7 +97,7 @@ function MenuScreen({ navigation }) {
 
       {/* Lịch sử trên tài khoản */ }
       <Text style={ styles.sectionTitle }>LỊCH SỬ TRÊN TÀI KHOẢN</Text>
-      { renderMenuItem("time-outline", "Truyện đã xem", () => navigation.navigate("history")) }
+      { renderMenuItem("time-outline", "Truyện đã xem", handleViewHistory) }
       { renderMenuItem("heart-outline", "Truyện đã thích") }
       { renderMenuItem("download-outline", "Truyện đã tải") }
       { renderMenuItem("add-circle-outline", "Truyện đã theo dõi",) }
