@@ -1,8 +1,9 @@
-// import User from "../models/user.js";
+import User from "../models/user.js";
 import OTP from "../models/otpVerify.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";  // ← Thêm dòng này
 
 dotenv.config();
 const SALT_ROUNDS = 10;
@@ -36,7 +37,20 @@ const getAll = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
-
+// const getAll = async (req, res) => {
+//   try {
+//     console.log("🔍 getAll - Bắt đầu query User.find()");
+//     console.log("🔍 mongoose.connection.readyState:", mongoose.connection.readyState); // 0 = disconnected, 1 = connected
+    
+//     const rs = await User.find().select("-password");
+//     console.log("✅ getAll - Tìm thấy", rs.length, "users");
+//     res.status(200).json(rs);
+//   } catch (error) {
+//     console.log("❌ ERROR getAll: ", error);
+//     console.log("❌ Error stack:", error.stack);
+//     res.status(500).json({ message: "Lỗi server", error: error.message });
+//   }
+// };
 /**
  * Generate OTP 6 chữ số, lưu vào collection OTP và gửi email
  */

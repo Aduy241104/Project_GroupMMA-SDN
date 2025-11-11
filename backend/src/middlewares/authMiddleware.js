@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-
+import mongoose from "mongoose";
 export const verifyTokenMiddleware = (req, res, next) => {
     const SECRET_KEY = process.env.JWT_SECRET;
     const authHeader = req.headers["authorization"];
