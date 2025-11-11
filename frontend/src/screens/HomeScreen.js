@@ -84,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
             {/* Mới đăng */ }
             <View style={ styles.sectionHeader }>
                 <Text style={ styles.sectionTitle }>Xem nhiều</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={ () => navigation.navigate("mostView") }>
                     <Text style={ styles.moreText }>Xem Thêm ›</Text>
                 </TouchableOpacity>
             </View>
