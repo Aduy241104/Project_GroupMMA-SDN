@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from 'react-native';
 import MenuScreen from "../screens/MenuScreen";
+import BookMarkScreen from "../screens/BookMarkScreen";
 import Profile from '../screens/Profile'
 import UpdateProfileScreen from "../screens/UpdateProfileScreen";
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
@@ -42,6 +43,7 @@ const MenuNavigation = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Main Menu" component={ MenuScreen } />
+            <Stack.Screen name="BookMark" component={BookMarkScreen}/>
             <Stack.Screen name="profile" component={ Profile } />
             <Stack.Screen name="update-profile" component={ UpdateProfileScreen } />
             <Stack.Screen name="change-password" component={ ChangePasswordScreen } />

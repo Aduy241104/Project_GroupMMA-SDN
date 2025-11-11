@@ -17,6 +17,7 @@ const ProfileScreen = ({ navigation }) => {
         return;
       }
 
+
       const response = await fetch(`${HOST}/api/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -44,59 +45,59 @@ const ProfileScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={ styles.loadingContainer }>
         <ActivityIndicator size="large" color="#1a73e8" />
-        <Text style={{ color: '#ccc', marginTop: 10 }}>Đang tải profile...</Text>
+        <Text style={ { color: '#ccc', marginTop: 10 } }>Đang tải profile...</Text>
       </View>
     );
   }
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Không có dữ liệu người dùng!</Text>
+      <View style={ styles.container }>
+        <Text style={ styles.errorText }>Không có dữ liệu người dùng!</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ alignItems: 'center', paddingVertical: 40 }}>
+    <ScrollView style={ styles.container } contentContainerStyle={ { alignItems: 'center', paddingVertical: 40 } }>
       <Image
-        source={{ uri: user.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}
-        style={styles.avatar}
+        source={ { uri: user.avatarUrl || 'https://cdn-icons-png.flaticon.com/512/149/149071.png' } }
+        style={ styles.avatar }
       />
-      <Text style={styles.username}>{user.username}</Text>
-      <Text style={styles.email}>{user.email}</Text>
+      <Text style={ styles.username }>{ user.username }</Text>
+      <Text style={ styles.email }>{ user.email }</Text>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Vai trò:</Text>
-        <Text style={styles.value}>{user.role || 'user'}</Text>
+      <View style={ styles.infoContainer }>
+        <Text style={ styles.label }>Vai trò:</Text>
+        <Text style={ styles.value }>{ user.role || 'user' }</Text>
       </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Trạng thái:</Text>
-        <Text style={[styles.value, { color: user.isActive ? '#0f0' : '#f00' }]}>
-          {user.isActive ? 'Đã kích hoạt' : 'Chưa kích hoạt'}
+      <View style={ styles.infoContainer }>
+        <Text style={ styles.label }>Trạng thái:</Text>
+        <Text style={ [styles.value, { color: user.isActive ? '#0f0' : '#f00' }] }>
+          { user.isActive ? 'Đã kích hoạt' : 'Chưa kích hoạt' }
         </Text>
       </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Giới thiệu:</Text>
-        <Text style={styles.value}>{user.bio || 'Chưa có bio'}</Text>
+      <View style={ styles.infoContainer }>
+        <Text style={ styles.label }>Giới thiệu:</Text>
+        <Text style={ styles.value }>{ user.bio || 'Chưa có bio' }</Text>
       </View>
 
-        <TouchableOpacity
-        style={styles.buttonChangePassword}
-        onPress={() => navigation.navigate('change-password', { user })}
+      <TouchableOpacity
+        style={ styles.buttonChangePassword }
+        onPress={ () => navigation.navigate('change-password', { user }) }
       >
-        <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+        <Text style={ styles.buttonText }>Đổi mật khẩu</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('update-profile', { user })}
+        style={ styles.button }
+        onPress={ () => navigation.navigate('update-profile', { user }) }
       >
-        <Text style={styles.buttonText}>Chỉnh sửa hồ sơ</Text>
+        <Text style={ styles.buttonText }>Chỉnh sửa hồ sơ</Text>
       </TouchableOpacity>
 
     </ScrollView>
