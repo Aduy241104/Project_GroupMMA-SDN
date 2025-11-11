@@ -60,7 +60,7 @@ const LoginScreen = ({ navigation }) => {
 
             <TextInput
                 style={ styles.input }
-                placeholder="Tên đăng nhập"
+                placeholder="Email"
                 placeholderTextColor="#888"
                 value={ email }
                 onChangeText={ setEmail }

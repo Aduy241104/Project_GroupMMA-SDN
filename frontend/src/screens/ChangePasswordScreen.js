@@ -31,7 +31,9 @@ const ChangePasswordScreen = ({ navigation }) => {
         body: JSON.stringify({ oldPassword, newPassword }),
       });
 
-      const data = await response.json();
+      const data = response.json();
+
+      console.log(data);
 
       if (response.ok) {
         Alert.alert('Thành công', data.message || 'Đổi mật khẩu thành công!');

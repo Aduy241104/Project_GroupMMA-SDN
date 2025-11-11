@@ -40,7 +40,7 @@ const UpdateProfileScreen = ({ route, navigation }) => {
         body: JSON.stringify({ username, avatarUrl, bio }),
       });
 
-      const data = await response.json();
+      const data = response.json();
 
       if (response.ok) {
         Alert.alert('Thành công', data.message || 'Cập nhật hồ sơ thành công!');

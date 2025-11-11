@@ -29,9 +29,9 @@ const login = async (req, res, next) => {
         }
 
         //tam thoi do chua ma hoa
-        // const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
-        const isMatch = user.password === password;
+        // const isMatch = user.password === password;
 
         if (!isMatch) {
             const err = new Error("Invalid password");
