@@ -2,7 +2,9 @@ import User from "../models/user.js";
 import OTP from "../models/otpVerify.js";
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'
+import bcrypt from "bcrypt";
 
+const SALT_ROUNDS = 10;
 dotenv.config();
 
 // Định nghĩa transporter ở ĐÂY - Scope toàn cục, trước các hàm
@@ -151,6 +153,173 @@ const verifyOTP = async (req, res) => {
     }
 };
 
+// GET /users/:id  (admin hoặc chính chủ)
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("ERROR getUserById:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// POST /users (admin tạo user)
+const createUserByAdmin = async (req, res) => {
+  try {
+    const { username, email, password, role = "user", avatarUrl = "", bio = "" } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Thiếu username/email/password" });
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password không hợp lệ! Phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+      });
+    }
+
+    const existU = await User.findOne({ username });
+    if (existU) return res.status(400).json({ message: "Username đã tồn tại" });
+
+    const existE = await User.findOne({ email });
+    if (existE) return res.status(400).json({ message: "Email đã tồn tại" });
+
+    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+
+    const newUser = new User({
+      username,
+      email,
+      password: hashed,
+      role,
+      avatarUrl,
+      bio,
+      isActive: true // admin tạo thì default active
+    });
+
+    const saved = await newUser.save();
+    const safe = saved.toObject();
+    delete safe.password;
+
+    res.status(201).json({ message: "User created", user: safe });
+  } catch (error) {
+    console.error("ERROR createUserByAdmin:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// PUT /users/:id  (admin hoặc chính chủ)
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = { ...req.body };
+
+    // Nếu có password trong body, hash trước khi lưu
+    if (updates.password) {
+      if (!PASSWORD_REGEX.test(updates.password)) {
+        return res.status(400).json({
+          message:
+            "Password không hợp lệ! Phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+        });
+      }
+      updates.password = await bcrypt.hash(updates.password, SALT_ROUNDS);
+    }
+
+    // Không cho user bình thường tự đổi role (nếu muốn, route có thể check)
+    if (req.user.role !== "admin" && updates.role) {
+      delete updates.role;
+    }
+
+    const updated = await User.findByIdAndUpdate(id, updates, { new: true }).select("-password");
+    if (!updated) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "Cập nhật thành công", user: updated });
+  } catch (error) {
+    console.error("ERROR updateUser:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// DELETE /users/:id (admin)
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await User.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "Xóa user thành công" });
+  } catch (error) {
+    console.error("ERROR deleteUser:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// PATCH /users/:id/block  (admin) -> set isActive = false
+const blockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentUserId = req.user.id || req.user._id;
+    
+    // Kiểm tra admin không thể block chính mình
+    if (currentUserId && currentUserId.toString() === id.toString()) {
+      return res.status(400).json({ message: "Bạn không thể block chính tài khoản của mình" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.isActive) {
+      return res.status(400).json({ message: "User đã bị block từ trước" });
+    }
+
+    user.isActive = false;
+    await user.save();
+
+    res.status(200).json({ message: "User đã bị block" });
+  } catch (error) {
+    console.error("ERROR blockUser:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// PATCH /users/:id/unblock  (admin) -> set isActive = true
+const unblockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentUserId = req.user.id || req.user._id;
+    
+    // Kiểm tra admin không thể unblock chính mình (để nhất quán với block)
+    if (currentUserId && currentUserId.toString() === id.toString()) {
+      return res.status(400).json({ message: "Bạn không thể unblock chính tài khoản của mình" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.isActive) {
+      return res.status(400).json({ message: "User đang active" });
+    }
+
+    user.isActive = true;
+    await user.save();
+
+    res.status(200).json({ message: "User đã được unblock" });
+  } catch (error) {
+    console.error("ERROR unblockUser:", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
 export default {
-    getAll, register, verifyOTP
-}
+  getAll,
+  register,
+  verifyOTP,
+  getUserById,
+  createUserByAdmin,
+  updateUser,
+  deleteUser,
+  blockUser,
+  unblockUser
+};

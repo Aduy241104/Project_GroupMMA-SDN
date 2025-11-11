@@ -10,7 +10,7 @@ const login = async (req, res, next) => {
     try {
 
         const user = await User.findOne({ email: email })
-            .select("-isActive -__v -updatedAt -createdAt").lean();
+            .select("-__v -updatedAt -createdAt").lean();
 
         console.log("USER: ", user);
 
@@ -18,6 +18,13 @@ const login = async (req, res, next) => {
         if (!user) {
             const err = new Error("Invalid Email!");
             err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err); 
+        }
+
+        // Kiểm tra tài khoản có bị block không
+        if (user.isActive === false) {
+            const err = new Error("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+            err.statusCode = StatusCodes.FORBIDDEN;
             return next(err); 
         }
 
@@ -34,6 +41,8 @@ const login = async (req, res, next) => {
 
         const token = jwtUtil.generateToken({ id: user._id, email: user.email, role: user.role });
         delete user.password;
+        // Không trả về isActive trong response
+        delete user.isActive;
 
         const responseData = {
             success: true,
