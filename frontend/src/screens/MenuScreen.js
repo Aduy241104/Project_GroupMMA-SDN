@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 function MenuScreen({ navigation }) {
     const { user, logout } = useContext(AuthContext);
-    
+
     const handleLogin = () => {
         navigation.navigate('login');
     };
@@ -33,55 +33,58 @@ function MenuScreen({ navigation }) {
 
 
     const renderMenuItem = (icon, text, onPress) => (
-        <TouchableOpacity style={ styles.menuItem } onPress={ onPress }>
-            <View style={ styles.iconText }>
-                <Icon name={ icon } size={ 20 } color="#4da6ff" style={ { width: 25 } } />
-                <Text style={ styles.menuText }>{ text }</Text>
+        <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+            <View style={styles.iconText}>
+                <Icon name={icon} size={20} color="#4da6ff" style={{ width: 25 }} />
+                <Text style={styles.menuText}>{text}</Text>
             </View>
-            <Icon name="chevron-forward" size={ 20 } color="#ccc" />
+            <Icon name="chevron-forward" size={20} color="#ccc" />
         </TouchableOpacity>
     );
 
     return (
-        <ScrollView style={ styles.container }>
-            <Text style={ styles.title }>Menu</Text>
+        <ScrollView style={styles.container}>
+            <Text style={styles.title}>Menu</Text>
 
 
-            <View style={ styles.profileSection }>
-                { user ? (
+            <View style={styles.profileSection}>
+                {user ? (
                     <>
-                        <View style={ styles.profileRow }>
-                            <View style={ styles.avatar }>
-                                <Text style={ styles.avatarText }>{ user.username?.charAt(0).toUpperCase() }</Text>
+                        <View style={styles.profileRow}>
+                            <View style={styles.avatar}>
+                                <Text style={styles.avatarText}>{user.username?.charAt(0).toUpperCase()}</Text>
                             </View>
                             <View>
-                                <Text style={ styles.username }>{ user.username }</Text>
-                                <Text style={ styles.subText }>TYT - Truyện Online, Offline</Text>
+                                <Text style={styles.username}>{user.username}</Text>
+                                <Text style={styles.subText}>TYT - Truyện Online, Offline</Text>
                             </View>
                         </View>
 
-                        <TouchableOpacity style={ { width: 80 } } onPress={ handleLogout }>
-                            <Text style={ styles.logoutText }>Đăng xuất</Text>
+                        <TouchableOpacity style={{ width: 80 }} onPress={handleLogout}>
+                            <Text style={styles.logoutText}>Đăng xuất</Text>
                         </TouchableOpacity>
                     </>
                 ) : (
-                    <TouchableOpacity style={ styles.loginButton } onPress={ handleLogin }>
-                        <Text style={ styles.loginText }>Đăng nhập</Text>
+                    <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                        <Text style={styles.loginText}>Đăng nhập</Text>
                     </TouchableOpacity>
-                ) }
+                )}
             </View>
 
-            {/* Lịch sử trên tài khoản */ }
-            <Text style={ styles.sectionTitle }>LỊCH SỬ TRÊN TÀI KHOẢN</Text>
-            { renderMenuItem('time-outline', 'Truyện đã xem') }
-            { renderMenuItem('heart-outline', 'Truyện đã thích') }
-            { renderMenuItem('download-outline', 'Truyện đã tải') }
-            { renderMenuItem('add-circle-outline', 'Truyện đã theo dõi') }
-            { renderMenuItem('person-add-outline', 'Người đang theo dõi') }
+            {/* Lịch sử trên tài khoản */}
+            <Text style={styles.sectionTitle}>LỊCH SỬ TRÊN TÀI KHOẢN</Text>
+            {renderMenuItem('time-outline', 'Truyện đã xem')}
+            {renderMenuItem('heart-outline', 'Truyện đã thích')}
+            {renderMenuItem('download-outline', 'Truyện đã tải')}
+            {renderMenuItem('add-circle-outline', 'Truyện đã theo dõi')}
+            {renderMenuItem('person-add-outline', 'Người đang theo dõi')}
 
-            {/* Thông báo */ }
-            <Text style={ styles.sectionTitle }>THÔNG BÁO</Text>
-            { renderMenuItem('notifications-outline', 'Thông báo của tôi') }
+            {/* Thông báo */}
+            <Text style={styles.sectionTitle}>THÔNG BÁO</Text>
+            {renderMenuItem('notifications-outline', 'Thông báo của tôi')}
+            {renderMenuItem('bookmark-outline', 'Bộ sưu tập của tôi', () => {
+                navigation.navigate('BookMark'); // hoặc tên màn hình quản lý bookmark của bạn
+            })}
 
         </ScrollView>
     );

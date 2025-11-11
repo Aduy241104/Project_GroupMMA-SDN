@@ -11,7 +11,21 @@ function StoryDetailScreen({ route, navigation }) {
     const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
     const isFocus = useIsFocused();
+
+    const fetchBookmarkStatus = async (storyId) => {
+        if (!token) return;
+        try {
+            const res = await api.get(`/api/bookmark/check?storyId=${storyId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setIsBookmarked(res?.data?.bookmarked ?? false);
+        } catch (err) {
+            console.error("Lỗi khi fetch bookmark:", err);
+            setIsBookmarked(false);
+        }
+    };
 
     useEffect(() => {
         const fetchChaptersAndLike = async () => {
@@ -76,78 +90,109 @@ function StoryDetailScreen({ route, navigation }) {
         }
     };
 
+    const handleBookmarkToggle = async () => {
+        if (!token) {
+            Alert.alert("Thông báo", "Bạn cần đăng nhập để bookmark truyện");
+            return;
+        }
+        try {
+            if (isBookmarked) {
+                // Gọi đúng endpoint delete với body { storyId }
+                await api.delete(`/api/bookmark/remove`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    data: { storyId: data._id }  // ⚠️ axios delete cần dùng 'data' để gửi body
+                });
+                setIsBookmarked(false);
+            } else {
+                await api.post(`/api/bookmark/add`, { storyId: data._id }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setIsBookmarked(true);
+            }
+        } catch (err) {
+            console.error("Lỗi khi thêm/bỏ bookmark:", err);
+            Alert.alert("Lỗi", "Bạn đã lưu truyện này vào bộ sưu tập rồi");
+        }
+    };
+
+    const handleCommentPress = () => {
+    
+        navigation.navigate("comment", { storyId: data._id });
+    };
+
     return (
-        <View style={ { flex: 1, backgroundColor: "#000" } }>
+        <View style={{ flex: 1, backgroundColor: "#000" }}>
             <ScrollView
-                style={ styles.container }
-                contentContainerStyle={ { paddingBottom: 100 } } // chừa khoảng trống cho nút
+                style={styles.container}
+                contentContainerStyle={{ paddingBottom: 100 }} // chừa khoảng trống cho nút
             >
-                {/* Tiêu đề */ }
-                <Text style={ styles.title }>{ data.title }</Text>
+                {/* Tiêu đề */}
+                <Text style={styles.title}>{data.title}</Text>
 
-                {/* Tác giả */ }
-                <Text style={ styles.author }>Tác giả: { data.authorId?.name }</Text>
+                {/* Tác giả */}
+                <Text style={styles.author}>Tác giả: {data.authorId?.name}</Text>
 
-                {/* Ảnh bìa */ }
-                <Image source={ { uri: data.coverImage } } style={ styles.coverImage } />
+                {/* Ảnh bìa */}
+                <Image source={{ uri: data.coverImage }} style={styles.coverImage} />
 
-                {/* Thông tin phụ */ }
-                <View style={ styles.infoRow }>
-                    <Text style={ styles.infoText }>Thể loại:</Text>
-                    { data.categoryIds.map((cat) => (
-                        <Text key={ cat._id } style={ styles.tag }>{ cat.name }</Text>
-                    )) }
+                {/* Thông tin phụ */}
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoText}>Thể loại:</Text>
+                    {data.categoryIds.map((cat) => (
+                        <Text key={cat._id} style={styles.tag}>{cat.name}</Text>
+                    ))}
                 </View>
 
-                <View style={ styles.infoRow }>
-                    <Text style={ styles.infoText }>Trạng thái: </Text>
-                    <Text style={ styles.normalText }>
-                        { data.status === "completed" ? "Hoàn thành" : "Đang ra" }
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoText}>Trạng thái: </Text>
+                    <Text style={styles.normalText}>
+                        {data.status === "completed" ? "Hoàn thành" : "Đang ra"}
                     </Text>
                 </View>
 
-                <View style={ styles.infoRow }>
-                    <Text style={ styles.infoText }>Lượt xem:</Text>
-                    <Text style={ styles.normalText }>{ data.views }</Text>
-                    <Text style={ [styles.infoText, { marginLeft: 10 }] }>Lượt thích:</Text>
-                    <Text style={ styles.normalText }>{ data.totalLikes }</Text>
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoText}>Lượt xem:</Text>
+                    <Text style={styles.normalText}>{data.views}</Text>
+                    <Text style={[styles.infoText, { marginLeft: 10 }]}>Lượt thích:</Text>
+                    <Text style={styles.normalText}>{data.totalLikes}</Text>
                 </View>
 
-                <ActionButtons liked={ isLiked } onLike={ handleLikeToggle } />
+                <ActionButtons liked={isLiked} onLike={handleLikeToggle} bookmarked={isBookmarked} onBookmark={handleBookmarkToggle} onComment={handleCommentPress} />
 
-                {/* Mô tả */ }
-                <Text style={ styles.sectionTitle }>Giới thiệu</Text>
-                <Text style={ styles.description }>{ data.description }</Text>
 
-                {/* Danh sách chương */ }
-                <Text style={ styles.sectionTitle }>Danh sách chương</Text>
-                { loading ? (
-                    <ActivityIndicator size="large" color="#fff" style={ { marginTop: 10 } } />
+                {/* Mô tả */}
+                <Text style={styles.sectionTitle}>Giới thiệu</Text>
+                <Text style={styles.description}>{data.description}</Text>
+
+                {/* Danh sách chương */}
+                <Text style={styles.sectionTitle}>Danh sách chương</Text>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#fff" style={{ marginTop: 10 }} />
                 ) : chapters.length > 0 ? (
                     chapters.map((ch) => (
                         <TouchableOpacity
-                            key={ ch._id }
-                            style={ styles.chapterItem }
-                            onPress={ () => navigation.navigate("read", { chapter: ch }) }
+                            key={ch._id}
+                            style={styles.chapterItem}
+                            onPress={() => navigation.navigate("read", { chapter: ch })}
                         >
-                            <Text style={ styles.chapterTitle }>
-                                Chương { ch.chapterNumber }: { ch.title }
+                            <Text style={styles.chapterTitle}>
+                                Chương {ch.chapterNumber}: {ch.title}
                             </Text>
                         </TouchableOpacity>
                     ))
                 ) : (
-                    <Text style={ { color: "#aaa", fontStyle: "italic" } }>Chưa có chương nào.</Text>
-                ) }
+                    <Text style={{ color: "#aaa", fontStyle: "italic" }}>Chưa có chương nào.</Text>
+                )}
             </ScrollView>
 
-            {/* Nút hành động cố định ở dưới */ }
-            <View style={ styles.fixedButtonContainer }>
+            {/* Nút hành động cố định ở dưới */}
+            <View style={styles.fixedButtonContainer}>
                 <TouchableOpacity
-                    style={ styles.button }
-                    disabled={ chapters.length === 0 }
-                    onPress={ () => navigation.navigate("chapterDetail", { chapter: chapters[0], story: data }) }
+                    style={styles.button}
+                    disabled={chapters.length === 0}
+                    onPress={() => navigation.navigate("chapterDetail", { chapter: chapters[0], story: data })}
                 >
-                    <Text style={ styles.buttonText }>Đọc Truyện</Text>
+                    <Text style={styles.buttonText}>Đọc Truyện</Text>
                 </TouchableOpacity>
             </View>
         </View>

@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from 'react-native';
 import MenuScreen from "../screens/MenuScreen";
+import BookMarkScreen from "../screens/BookMarkScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ const MenuNavigation = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Main Menu" component={ MenuScreen } />
+            <Stack.Screen name="BookMark" component={BookMarkScreen}/>
         </Stack.Navigator>
     )
 }
