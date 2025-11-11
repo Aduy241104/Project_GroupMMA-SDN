@@ -9,9 +9,12 @@ router.get("/", storyController.getAllStory);
 
 router.get("/home", storyController.getHomeData);
 
+router.get("/most-view", storyController.getMostViewedData);
+
 router.get("/search", storyController.findStory);
 
 router.patch("/update-view/:id", storyController.updateStoryView);
+
 
 // route mới: lấy chi tiết story
 router.get("/:id", storyController.getStoryById);
@@ -24,6 +27,7 @@ router.put("/update/:id", verifyTokenMiddleware, verifyAdmin, storyController.up
 
 // admin - xóa truyện (chỉ 'novel')
 router.delete("/delete/:id", verifyTokenMiddleware, verifyAdmin, storyController.deleteStory);
+
 
 
 export default router;

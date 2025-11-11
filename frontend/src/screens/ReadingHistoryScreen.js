@@ -45,7 +45,7 @@ const ReadingHistoryScreen = ({ navigation }) => {
                 onPress: async () => {
                     try {
                         await axios.delete(`/api/history/delete/${id}`);
-                        setReload(prev => !prev); // 👈 chỉ cần toggle reload để tự fetch lại
+                        setReload(prev => !prev); // chỉ cần toggle reload để tự fetch lại
                     } catch (error) {
                         console.error('Lỗi khi xóa lịch sử:', error);
                         Alert.alert('Lỗi', 'Không thể xóa lịch sử. Vui lòng thử lại sau.');
