@@ -5,6 +5,7 @@ import ActionButtons from '../components/ActionsButtons';
 import { useIsFocused } from '@react-navigation/native';
 import { AuthContext } from "../context/AuthContext";
 
+
 function StoryDetailScreen({ route, navigation }) {
     const { data } = route.params;
     const { token } = useContext(AuthContext);
@@ -12,6 +13,21 @@ function StoryDetailScreen({ route, navigation }) {
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
     const isFocus = useIsFocused();
+
+    useEffect(() => {
+
+        const handleSaveHistory = async () => {
+            try {
+                await api.post(`/api/history/update-history/${data._id}`)
+                console.log("Save history");
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        handleSaveHistory();
+    }, [data._id])
 
     useEffect(() => {
         const fetchChaptersAndLike = async () => {

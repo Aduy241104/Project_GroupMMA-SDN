@@ -60,6 +60,33 @@ const login = async (req, res, next) => {
     }
 }
 
+// POST /logout 
+const logout = async (req, res, next) => {
+    try {
+        // Lấy token từ header (Bearer token) để confirm auth
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            const err = new Error("No token provided!");
+            err.statusCode = StatusCodes.UNAUTHORIZED;
+            return next(err);
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        jwtUtil.verifyToken(token);  
+
+        const responseData = {
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "Logout successful! Tạm biệt, hẹn gặp lại với những câu chuyện truyện tranh hay hơn."
+        };
+
+        res.status(StatusCodes.OK).json(responseData);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
-    login,
+    login, logout
 }

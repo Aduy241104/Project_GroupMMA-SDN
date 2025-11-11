@@ -25,7 +25,7 @@ function MainTab() {
                 tabBarInactiveTintColor: "gray",
                 tabBarStyle: {
                     backgroundColor: "#222222ff",
-                    height: 86,
+                    height: 60,
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
                     position: "absolute",
