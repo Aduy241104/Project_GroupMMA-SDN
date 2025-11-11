@@ -16,7 +16,7 @@ function MenuScreen({ navigation }) {
   const { user, logout } = useContext(AuthContext);
 
   const handleLogin = () => {
-    navigation.navigate("login");
+    navigation.navigate('login');
   };
 
   const handleManageProfile = () => {
@@ -36,6 +36,16 @@ function MenuScreen({ navigation }) {
       },
     ]);
   };
+
+
+
+  const handleViewHistory = () => {
+    if (!user) {
+      Alert.alert("Thông báo", "Bạn cần đăng nhập để xem lịch sử");
+      return;
+    }
+    navigation.navigate("history")
+  }
 
   const renderMenuItem = (icon, text, onPress) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
@@ -88,15 +98,20 @@ function MenuScreen({ navigation }) {
 
       {/* Lịch sử trên tài khoản */}
       <Text style={styles.sectionTitle}>LỊCH SỬ TRÊN TÀI KHOẢN</Text>
-      {renderMenuItem("time-outline", "Truyện đã xem")}
+      {renderMenuItem("time-outline", "Truyện đã xem", handleViewHistory)}
       {renderMenuItem("heart-outline", "Truyện đã thích")}
       {renderMenuItem("download-outline", "Truyện đã tải")}
-      {renderMenuItem("add-circle-outline", "Truyện đã theo dõi")}
+      {renderMenuItem("add-circle-outline", "Truyện đã theo dõi",)}
       {renderMenuItem("person-add-outline", "Người đang theo dõi")}
 
       {/* Thông báo */}
       <Text style={styles.sectionTitle}>THÔNG BÁO</Text>
       {renderMenuItem("notifications-outline", "Thông báo của tôi")}
+      {renderMenuItem('bookmark-outline', 'Bộ sưu tập của tôi', () => {
+        navigation.navigate('BookMark'); // hoặc tên màn hình quản lý bookmark của bạn
+      })}
+
+
     </ScrollView>
   );
 }

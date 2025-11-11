@@ -1,11 +1,18 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from 'react-native';
 import MenuScreen from "../screens/MenuScreen";
+import BookMarkScreen from "../screens/BookMarkScreen";
 import Profile from '../screens/Profile'
 import UpdateProfileScreen from "../screens/UpdateProfileScreen";
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+import ReadingHistoryScreen from "../screens/ReadingHistoryScreen";
+import { useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
+
 
 const Stack = createNativeStackNavigator();
+
+
 
 
 const Temp = ({ navigation }) => {
@@ -21,12 +28,26 @@ const Temp = ({ navigation }) => {
 }
 
 const MenuNavigation = () => {
+
+    const navigation = useNavigation();
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('tabPress', (e) => {
+            // Reset stack mỗi khi bấm lại vào tab Settings
+            navigation.navigate('Settings', {
+                screen: 'Main Menu', // 👈 reset về screen đầu tiên
+            });
+        });
+
+        return unsubscribe;
+    }, [navigation]);
     return (
         <Stack.Navigator>
             <Stack.Screen name="Main Menu" component={ MenuScreen } />
+            <Stack.Screen name="BookMark" component={BookMarkScreen}/>
             <Stack.Screen name="profile" component={ Profile } />
             <Stack.Screen name="update-profile" component={ UpdateProfileScreen } />
             <Stack.Screen name="change-password" component={ ChangePasswordScreen } />
+            <Stack.Screen name="history" component={ ReadingHistoryScreen } />
         </Stack.Navigator>
     )
 }

@@ -2,121 +2,128 @@ import Comment from '../models/comment.js';
 import { StatusCodes } from 'http-status-codes';
 import { createResponse } from '../utils/createResponse.js';
 
+// --- Thêm comment ---
+export const createComment = async (req, res, next) => {
+    try {
+        const { storyId, content } = req.body;
+        const userId = req.user?.id;
 
-const createComment = async (req, res, next) => {
-	try {
-		const { storyId, content } = req.body;
-		const userId = req.user?.id;
+        if (!userId) {
+            const err = new Error('User not authenticated');
+            err.statusCode = StatusCodes.UNAUTHORIZED;
+            return next(err);
+        }
 
-		if (!userId) {
-			const err = new Error('User not authenticated');
-			err.statusCode = StatusCodes.UNAUTHORIZED;
-			return next(err);
-		}
-
-		const comment = await Comment.create({ storyId, userId, content });
-		res.status(StatusCodes.CREATED).json(createResponse({ statusCode: StatusCodes.CREATED, message: 'Comment created', data: { comment } }));
-	} catch (error) {
-		next(error);
-	}
+        const comment = await Comment.create({ storyId, userId, content });
+        res.status(StatusCodes.CREATED).json(
+            createResponse({ statusCode: StatusCodes.CREATED, message: 'Comment created', data: { comment } })
+        );
+    } catch (error) {
+        next(error);
+    }
 };
 
-const getCommentsByStory = async (req, res, next) => {
-  const { storyId } = req.params;
-  try {
-    const comments = await Comment.find({ storyId })
-      .populate({ path: 'userId', select: 'name username _id' }) // Lấy thêm thông tin user
-      .sort({ createdAt: -1 });
+// --- Lấy tất cả comment theo story ---
+export const getCommentsByStory = async (req, res, next) => {
+    try {
+        const { storyId } = req.params;
+        const comments = await Comment.find({ storyId })
+            .populate('userId', 'name username avatar')
+            .sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      data: { comments },
-    });
-  } catch (error) {
-    next(error);
-  }
+        res.status(StatusCodes.OK).json(
+            createResponse({ success: true, message: 'Success', data: { comments } })
+        );
+    } catch (error) {
+        next(error);
+    }
 };
 
-const updateComment = async (req, res, next) => {
-	const { id } = req.params;
-	try {
-		const comment = await Comment.findById(id);
-		if (!comment) {
-			const err = new Error('Comment not found');
-			err.statusCode = StatusCodes.NOT_FOUND;
-			return next(err);
-		}
+// --- Lấy tất cả comment (admin) ---
+export const getAllComments = async (req, res, next) => {
+    try {
+        const comments = await Comment.find()
+            .populate('userId', 'name username avatar')
+            .sort({ createdAt: -1 });
 
-		// only owner or admin can update
-		const user = req.user;
-		if (!user) {
-			const err = new Error('User not authenticated');
-			err.statusCode = StatusCodes.UNAUTHORIZED;
-			return next(err);
-		}
-
-		if (user.role !== 'admin' && String(comment.userId) !== String(user.id)) {
-			const err = new Error('Permission denied');
-			err.statusCode = StatusCodes.FORBIDDEN;
-			return next(err);
-		}
-
-		comment.content = req.body.content ?? comment.content;
-		await comment.save();
-
-		res.status(StatusCodes.OK).json(createResponse({ message: 'Comment updated', data: { comment } }));
-	} catch (error) {
-		next(error);
-	}
+        res.status(StatusCodes.OK).json(
+            createResponse({ success: true, message: 'Success', data: { comments } })
+        );
+    } catch (error) {
+        next(error);
+    }
 };
 
-const deleteComment = async (req, res, next) => {
-	const { id } = req.params;
-	try {
-		const comment = await Comment.findById(id);
-		if (!comment) {
-			const err = new Error('Comment not found');
-			err.statusCode = StatusCodes.NOT_FOUND;
-			return next(err);
-		}
+// --- Sửa comment (owner hoặc admin) ---
+export const updateComment = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const comment = await Comment.findById(id);
+        if (!comment) {
+            const err = new Error('Comment not found');
+            err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err);
+        }
 
-		const user = req.user;
-		if (!user) {
-			const err = new Error('User not authenticated');
-			err.statusCode = StatusCodes.UNAUTHORIZED;
-			return next(err);
-		}
+        const user = req.user;
+        if (!user) {
+            const err = new Error('User not authenticated');
+            err.statusCode = StatusCodes.UNAUTHORIZED;
+            return next(err);
+        }
 
-		if (user.role !== 'admin' && String(comment.userId) !== String(user.id)) {
-			const err = new Error('Permission denied');
-			err.statusCode = StatusCodes.FORBIDDEN;
-			return next(err);
-		}
+        if (user.role !== 'admin' && String(comment.userId) !== String(user.id)) {
+            const err = new Error('Permission denied');
+            err.statusCode = StatusCodes.FORBIDDEN;
+            return next(err);
+        }
 
-		await comment.remove();
-		res.status(StatusCodes.OK).json(createResponse({ message: 'Comment deleted' }));
-	} catch (error) {
-		next(error);
-	}
+        comment.content = req.body.content ?? comment.content;
+        await comment.save();
+
+        res.status(StatusCodes.OK).json(
+            createResponse({ message: 'Comment updated', data: { comment } })
+        );
+    } catch (error) {
+        next(error);
+    }
 };
 
-const getAllComments = async (req, res, next) => {
-  try {
-    const comments = await Comment.find()
-      .populate({ path: 'userId', select: 'name username _id' }) // populate user info
-      .sort({ createdAt: -1 });
+// --- Xóa comment (owner hoặc admin) ---
+export const deleteComment = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const comment = await Comment.findById(id);
+        if (!comment) {
+            const err = new Error('Comment not found');
+            err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err);
+        }
 
-    res.status(StatusCodes.OK).json(
-      createResponse({ success: true, message: 'Success', data: { comments } })
-    );
-  } catch (error) {
-    next(error);
-  }
+        const user = req.user;
+        if (!user) {
+            const err = new Error('User not authenticated');
+            err.statusCode = StatusCodes.UNAUTHORIZED;
+            return next(err);
+        }
+
+        if (user.role !== 'admin' && String(comment.userId) !== String(user.id)) {
+            const err = new Error('Permission denied');
+            err.statusCode = StatusCodes.FORBIDDEN;
+            return next(err);
+        }
+
+        await comment.remove();
+        res.status(StatusCodes.OK).json(
+            createResponse({ message: 'Comment deleted' })
+        );
+    } catch (error) {
+        next(error);
+    }
 };
 
-
-// adminDeleteComment: admin xóa comment bất kỳ
-const adminDeleteComment = async (req, res, next) => {
+// --- Admin xóa bất kỳ comment ---
+export const adminDeleteComment = async (req, res, next) => {
     const { id } = req.params;
     try {
         const comment = await Comment.findById(id);
@@ -127,14 +134,16 @@ const adminDeleteComment = async (req, res, next) => {
         }
 
         await comment.remove();
-        res.status(StatusCodes.OK).json(createResponse({ message: 'Comment deleted by admin' }));
+        res.status(StatusCodes.OK).json(
+            createResponse({ message: 'Comment deleted by admin' })
+        );
     } catch (error) {
         next(error);
     }
 };
 
-// adminUpdateComment: admin update comment bất kỳ
-const adminUpdateComment = async (req, res, next) => {
+// --- Admin update bất kỳ comment ---
+export const adminUpdateComment = async (req, res, next) => {
     const { id } = req.params;
     try {
         const comment = await Comment.findById(id);
@@ -147,19 +156,10 @@ const adminUpdateComment = async (req, res, next) => {
         comment.content = req.body.content ?? comment.content;
         await comment.save();
 
-        res.status(StatusCodes.OK).json(createResponse({ message: 'Comment updated by admin', data: { comment } }));
+        res.status(StatusCodes.OK).json(
+            createResponse({ message: 'Comment updated by admin', data: { comment } })
+        );
     } catch (error) {
         next(error);
     }
-};
-
-
-export default {
-	createComment,
-	getCommentsByStory,
-	updateComment,
-	deleteComment,
-	getAllComments,
-	adminDeleteComment,
-	adminUpdateComment
 };

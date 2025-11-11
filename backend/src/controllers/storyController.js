@@ -42,6 +42,26 @@ const getHomeData = async (req, res) => {
 }
 
 
+const getMostViewedData = async (req, res, next) => {
+    try {
+
+        const mostViewedStories = await getMostViewedStories(20);
+        res.status(200).json({
+            success: true,
+            statusCode: StatusCodes.OK,
+            message: "Get most viewed data successfully",
+            data: {
+                mostViewedStory: mostViewedStories
+            }
+        })
+
+    } catch (error) {
+        console.log("💥ERROR: ", error);
+        next(error);
+    }
+}
+
+
 const findStory = async (req, res, next) => {
     const { type, keyword } = req.query;
 
@@ -123,5 +143,6 @@ export default {
     getAllStory,
     getHomeData,
     findStory,
-    updateStoryView
+    updateStoryView,
+    getMostViewedData
 }

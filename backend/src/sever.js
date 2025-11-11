@@ -5,6 +5,7 @@ import connectMongose from "./config/connectDatabase.js";
 import route from "./routes/index.js";
 import cookieParser from 'cookie-parser';
 import { errorHandler } from "./middlewares/errorHandler.js";
+import ReadingHistory from "./models/readingHistory.js";
 
 const app = express();
 
