@@ -10,7 +10,7 @@ const icons = {
     "Category": "albums",
     "User": "people",
     "Create Story": "chatbubbles",
-    "Create Chapter": "person",
+    "Comments": "person",
 };
 
 export default function CategoryButton({ title, onPress }) {

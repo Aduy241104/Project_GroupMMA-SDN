@@ -9,7 +9,7 @@ import authorRouter from "./author.route.js";
 import bookmarkRoute from "./bookmark.route.js";
 import commentRoute from "./comment.route.js";
 import readingHistoryRouter from "./history.route.js";
-
+import adminCommentRouter from "./adminComment.route.js";
 import { verifyAdmin, verifyTokenMiddleware } from "../middlewares/authMiddleware.js";
 
 function route(app) {
@@ -28,6 +28,7 @@ function route(app) {
     app.use("/api/bookmark", bookmarkRoute);
     app.use("/api/comments", commentRoute);
     app.use("/api/history", readingHistoryRouter)
+    app.use('/api/admin/comments', adminCommentRouter);
 
 }
 
