@@ -7,11 +7,15 @@ const icons = {
     "Yêu Thích": "heart",
     "Xem Nhiều": "stats-chart",
     "Thịnh Hành": "trending-up",
+    "Category": "albums",
+    "User": "people",
+    "Create Story": "chatbubbles",
+    "Create Chapter": "person",
 };
 
-export default function CategoryButton({ title }) {
+export default function CategoryButton({ title, onPress }) {
     return (
-        <TouchableOpacity style={ styles.button }>
+        <TouchableOpacity style={ styles.button } onPress={ onPress }>
             <Ionicons name={ icons[title] } size={ 20 } color="#6fd4ff" />
             <Text style={ styles.text }>{ title }</Text>
         </TouchableOpacity>

@@ -6,7 +6,6 @@ import {
     FlatList,
     Image,
     TouchableOpacity,
-    ScrollView,
     StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -67,86 +66,73 @@ const AdminScreen = ({ navigation }) => {
     }
 
     return (
-        <ScrollView style={styles.container} nestedScrollEnabled={true}>
-            {/* Header */}
-            <Text style={styles.headerTitle}>Menu Admin</Text>
+        <FlatList
+            style={styles.container}
+            data={[]}
+            keyExtractor={() => "empty"}
+            ListHeaderComponent={(
+                <View>
+                    {/* Bỏ các nút chức năng ở AdminScreen, chuyển sang AdminNavigation */}
 
-            {/* Admin Actions - hiển thị CategoryButton */}
-            <View style={styles.filterRow}>
-                <TouchableOpacity
-                    style={styles.adminActionButton}
-                    onPress={() => navigation.navigate("CategoryManagement")}
-                >
-                    <Ionicons name="bookmarks" size={20} color="#6fd4ff" />
-                    <Text style={styles.adminActionText}>Thể loại</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.adminActionButton}
-                    onPress={() => navigation.navigate("CreateStory")}
-                >
-                    <Ionicons name="add-circle-outline" size={20} color="#6fd4ff" />
-                    <Text style={styles.adminActionText}>Thêm truyện</Text>
-                </TouchableOpacity>
-            </View>
+                    {/* Mới đăng */}
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Mới đăng</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.moreText}>Xem Thêm ›</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.flatListContainer}>
+                        <FlatList
+                            horizontal
+                            data={data.addedRecentlyStories}
+                            renderItem={renderStoryItem}
+                            keyExtractor={(item) => item._id}
+                            showsHorizontalScrollIndicator={false}
+                            scrollEnabled={true}
+                            nestedScrollEnabled={true}
+                        />
+                    </View>
 
-            {/* Mới đăng */}
-            <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Mới đăng</Text>
-                <TouchableOpacity>
-                    <Text style={styles.moreText}>Xem Thêm ›</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.flatListContainer}>
-                <FlatList
-                    horizontal
-                    data={data.addedRecentlyStories}
-                    renderItem={renderStoryItem}
-                    keyExtractor={(item) => item._id}
-                    showsHorizontalScrollIndicator={false}
-                    scrollEnabled={true}
-                    nestedScrollEnabled={true}
-                />
-            </View>
+                    {/* Xem nhiều */}
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Xem nhiều</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.moreText}>Xem Thêm ›</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.flatListContainer}>
+                        <FlatList
+                            horizontal
+                            data={data.mostViewedStories}
+                            renderItem={renderStoryItem}
+                            keyExtractor={(item) => item._id}
+                            showsHorizontalScrollIndicator={false}
+                            scrollEnabled={true}
+                            nestedScrollEnabled={true}
+                        />
+                    </View>
 
-            {/* Xem nhiều */}
-            <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Xem nhiều</Text>
-                <TouchableOpacity>
-                    <Text style={styles.moreText}>Xem Thêm ›</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.flatListContainer}>
-                <FlatList
-                    horizontal
-                    data={data.mostViewedStories}
-                    renderItem={renderStoryItem}
-                    keyExtractor={(item) => item._id}
-                    showsHorizontalScrollIndicator={false}
-                    scrollEnabled={true}
-                    nestedScrollEnabled={true}
-                />
-            </View>
-
-            {/* Mới cập nhật */}
-            <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Mới cập nhật</Text>
-                <TouchableOpacity>
-                    <Text style={styles.moreText}>Xem Thêm ›</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.flatListContainer}>
-                <FlatList
-                    horizontal
-                    data={data.updatedRecentlyStories}
-                    renderItem={renderStoryItemUpdated}
-                    keyExtractor={(item) => item._id}
-                    showsHorizontalScrollIndicator={false}
-                    scrollEnabled={true}
-                    nestedScrollEnabled={true}
-                />
-            </View>
-
-        </ScrollView>
+                    {/* Mới cập nhật */}
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Mới cập nhật</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.moreText}>Xem Thêm ›</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.flatListContainer}>
+                        <FlatList
+                            horizontal
+                            data={data.updatedRecentlyStories}
+                            renderItem={renderStoryItemUpdated}
+                            keyExtractor={(item) => item._id}
+                            showsHorizontalScrollIndicator={false}
+                            scrollEnabled={true}
+                            nestedScrollEnabled={true}
+                        />
+                    </View>
+                </View>
+            )}
+        />
     );
 };
 
@@ -170,25 +156,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginBottom: 10,
     },
-    filterRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20,
-    },
-    adminActionButton: {
-        backgroundColor: "#1a1a1a",
-        width: 90,
-        height: 70,
-        borderRadius: 10,
-        justifyContent: "center",
-        alignItems: "center",
-        marginRight: 10,
-    },
-    adminActionText: {
-        color: "#fff",
-        marginTop: 5,
-        fontSize: 13,
-    },
+    // removed admin action buttons; navigation buttons live in AdminNavigation
     sectionHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
