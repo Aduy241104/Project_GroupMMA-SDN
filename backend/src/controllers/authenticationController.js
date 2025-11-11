@@ -51,6 +51,7 @@ const login = async (req, res, next) => {
     }
 }
 
+
 // POST /logout 
 const logout = async (req, res, next) => {
     try {
@@ -80,4 +81,5 @@ const logout = async (req, res, next) => {
 
 export default {
     login, logout
+
 }

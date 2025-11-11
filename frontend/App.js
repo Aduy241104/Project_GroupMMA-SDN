@@ -19,7 +19,6 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
 
-  
   return (
     <AuthProvider>
       <NavigationContainer>
