@@ -21,11 +21,11 @@ console.log("EMAIL: ", email);
         body: JSON.stringify({ email, otpCode: otp }),
       });
 
-      const data = await response.json();
+      const data = response.json();
 
       if (response.ok) {
         Alert.alert('Thành công', data.message || 'Xác thực OTP thành công!');
-        navigation.navigate('login  ');
+        navigation.navigate('login');
       } else {
         Alert.alert('Lỗi', data.message || 'Mã OTP không chính xác hoặc đã hết hạn!');
       }

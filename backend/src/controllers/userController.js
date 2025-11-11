@@ -409,7 +409,6 @@ const changePassword = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Password cũ sai!" });
     }
-
     const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
     user.password = hashedNewPassword;
     await user.save();

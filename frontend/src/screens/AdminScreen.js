@@ -1,5 +1,5 @@
 import CategoryButton from "../components/CategoryButton";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
     View,
     Text,
@@ -11,8 +11,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import api from "../config/axiosConfig";
 import { useIsFocused } from "@react-navigation/native";
+import { AuthContext } from "../context/AuthContext";
 
 const AdminScreen = ({ navigation }) => {
+    const { user, loading } = useContext(AuthContext);
     const [data, setData] = useState(null);
     const isFocus = useIsFocused();
 
@@ -57,10 +59,31 @@ const AdminScreen = ({ navigation }) => {
   </TouchableOpacity>
 );
 
-    if (!data) {
+    if (loading || !data) {
         return (
             <View style={styles.loadingContainer}>
                 <Text style={{ color: "#fff" }}>Đang tải...</Text>
+            </View>
+        );
+    }
+
+    if (!user || (user.role !== "admin" && user.role !== "ADMIN")) {
+        return (
+            <View style={styles.loadingContainer}>
+                <Text style={{ color: "#fff", marginBottom: 10 }}>
+                    Bạn không có quyền truy cập trang này.
+                </Text>
+                <TouchableOpacity
+                    onPress={() => navigation.replace("MainTab")}
+                    style={{
+                        backgroundColor: "#1a1a1a",
+                        paddingHorizontal: 16,
+                        paddingVertical: 10,
+                        borderRadius: 8,
+                    }}
+                >
+                    <Text style={{ color: "#fff" }}>Về trang chính</Text>
+                </TouchableOpacity>
             </View>
         );
     }

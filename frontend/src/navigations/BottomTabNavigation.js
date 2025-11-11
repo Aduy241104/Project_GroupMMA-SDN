@@ -1,14 +1,19 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DiscoverNavigation from "./DiscoverNavigation";
 import SearchNavigation from "./SearchNavigation";
 import MenuNavigation from "./MenuNavigation";
 import AdminNavigation from "./AdminNavigation";
+import { AuthContext } from "../context/AuthContext";
 
 const Tab = createBottomTabNavigator();
 
 // --- Tạo Bottom Tab ---
 function MainTab() {
+    const { user } = useContext(AuthContext);
+    const isAdmin = user && (user.role === "admin" || user.role === "ADMIN");
+
     return (
         <Tab.Navigator
             screenOptions={ ({ route }) => ({
@@ -37,7 +42,7 @@ function MainTab() {
             <Tab.Screen name="Home" component={ DiscoverNavigation } />
             <Tab.Screen name="Search" component={ SearchNavigation } />
             <Tab.Screen name="Settings" component={ MenuNavigation } />
-            <Tab.Screen name="Admin" component={ AdminNavigation } />
+            { isAdmin && <Tab.Screen name="Admin" component={ AdminNavigation } /> }
         </Tab.Navigator>
     );
 }

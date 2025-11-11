@@ -16,6 +16,7 @@ router.get("/search", storyController.findStory);
 router.patch("/update-view/:id", storyController.updateStoryView);
 
 
+router.get("/home", storyController.getHomeData);
 // route mới: lấy chi tiết story
 router.get("/:id", storyController.getStoryById);
 
