@@ -1,8 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { HOST } from "@env";
-
-
+const HOST = process.env.HOST || "http://localhost:8080";
 
 console.log("HOST: ", HOST);
 

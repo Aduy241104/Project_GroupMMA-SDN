@@ -1,6 +1,6 @@
 import express from 'express';
 import commentController from '../controllers/commentController.js';
-import { verifyTokenMiddleware } from '../middlewares/authMiddleware.js';
+import { verifyTokenMiddleware , verifyAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -11,6 +11,12 @@ router.get('/story/:storyId', commentController.getCommentsByStory);
 router.put('/:id', verifyTokenMiddleware, commentController.updateComment);
 router.delete('/:id', verifyTokenMiddleware, commentController.deleteComment);
 
-router.get('/', verifyTokenMiddleware, commentController.getAllComments);
+router.get('/getAllComments', verifyTokenMiddleware, commentController.getAllComments);
+
+
+// Admin routes
+router.delete('/admin/comments/:id', verifyTokenMiddleware, verifyAdmin, commentController.adminDeleteComment);
+router.put('/admin/comments/:id', verifyTokenMiddleware, verifyAdmin, commentController.adminUpdateComment);
+
 
 export default router;

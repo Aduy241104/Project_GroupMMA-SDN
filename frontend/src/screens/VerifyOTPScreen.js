@@ -25,7 +25,7 @@ console.log("EMAIL: ", email);
 
       if (response.ok) {
         Alert.alert('Thành công', data.message || 'Xác thực OTP thành công!');
-        navigation.navigate('login  ');
+        navigation.navigate('login');
       } else {
         Alert.alert('Lỗi', data.message || 'Mã OTP không chính xác hoặc đã hết hạn!');
       }

@@ -11,6 +11,7 @@ import RegisterScreen from "./src/screens/RegisterScreen"
 import VerifyOTPScreen from './src/screens/VerifyOTPScreen';
 import ForgotPassword from './src/screens/ForgotPasswordScreen'
 import ResetPassword from './src/screens/ResetPasswordScreen'
+import ManageCommentsScreen from "./src/screens/ManageCommentsScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -50,6 +51,7 @@ export default function App() {
           <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
           <Stack.Screen name="forgot-password" component={ForgotPassword} />
           <Stack.Screen name="reset-password" component={ResetPassword} />
+          <Stack.Screen name="manager-comment" component={ManageCommentsScreen} />
 
         </Stack.Navigator>
       </NavigationContainer>

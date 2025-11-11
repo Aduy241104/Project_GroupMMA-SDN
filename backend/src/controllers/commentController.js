@@ -22,13 +22,19 @@ const createComment = async (req, res, next) => {
 };
 
 const getCommentsByStory = async (req, res, next) => {
-	const { storyId } = req.params;
-	try {
-		const comments = await Comment.find({ storyId }).populate([{ path: 'userId', select: 'name _id' }]).sort({ createdAt: -1 });
-		res.status(StatusCodes.OK).json(createResponse({ data: { comments } }));
-	} catch (error) {
-		next(error);
-	}
+  const { storyId } = req.params;
+  try {
+    const comments = await Comment.find({ storyId })
+      .populate({ path: 'userId', select: 'name username _id' }) // Lấy thêm thông tin user
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: { comments },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateComment = async (req, res, next) => {
@@ -95,18 +101,65 @@ const deleteComment = async (req, res, next) => {
 };
 
 const getAllComments = async (req, res, next) => {
-	try {
-		const comments = await Comment.find().populate([{ path: 'userId', select: 'name' }]).sort({ createdAt: -1 });
-		res.status(StatusCodes.OK).json(createResponse({ data: { comments } }));
-	} catch (error) {
-		next(error);
-	}
+  try {
+    const comments = await Comment.find()
+      .populate({ path: 'userId', select: 'name username _id' }) // populate user info
+      .sort({ createdAt: -1 });
+
+    res.status(StatusCodes.OK).json(
+      createResponse({ success: true, message: 'Success', data: { comments } })
+    );
+  } catch (error) {
+    next(error);
+  }
 };
+
+
+// adminDeleteComment: admin xóa comment bất kỳ
+const adminDeleteComment = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const comment = await Comment.findById(id);
+        if (!comment) {
+            const err = new Error('Comment not found');
+            err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err);
+        }
+
+        await comment.remove();
+        res.status(StatusCodes.OK).json(createResponse({ message: 'Comment deleted by admin' }));
+    } catch (error) {
+        next(error);
+    }
+};
+
+// adminUpdateComment: admin update comment bất kỳ
+const adminUpdateComment = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const comment = await Comment.findById(id);
+        if (!comment) {
+            const err = new Error('Comment not found');
+            err.statusCode = StatusCodes.NOT_FOUND;
+            return next(err);
+        }
+
+        comment.content = req.body.content ?? comment.content;
+        await comment.save();
+
+        res.status(StatusCodes.OK).json(createResponse({ message: 'Comment updated by admin', data: { comment } }));
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export default {
 	createComment,
 	getCommentsByStory,
 	updateComment,
 	deleteComment,
-	getAllComments
+	getAllComments,
+	adminDeleteComment,
+	adminUpdateComment
 };
