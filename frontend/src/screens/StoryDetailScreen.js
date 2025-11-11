@@ -5,6 +5,7 @@ import ActionButtons from '../components/ActionsButtons';
 import { useIsFocused } from '@react-navigation/native';
 import { AuthContext } from "../context/AuthContext";
 
+
 function StoryDetailScreen({ route, navigation }) {
     const { data } = route.params;
     const { token } = useContext(AuthContext);
@@ -28,6 +29,21 @@ function StoryDetailScreen({ route, navigation }) {
     };
 
     useEffect(() => {
+        if (token) {
+            const handleSaveHistory = async () => {
+                try {
+                    await api.post(`/api/history/update-history/${data._id}`)
+                    console.log("Save history");
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            handleSaveHistory();
+        }
+    }, [data._id]);
+
+    useEffect(() => {
         const fetchChaptersAndLike = async () => {
             setLoading(true);
             try {
@@ -37,9 +53,9 @@ function StoryDetailScreen({ route, navigation }) {
 
                 if (result.success && result.data?.chapters) {
                     const sortedChapters = result.data.chapters.sort(
-                        (a, b) => a.chapterNumber - b.chapterNumber
+                        (a, b) => b.chapterNumber - a.chapterNumber
                     );
-                    setChapters(sortedChapters);
+                    setChapters(sortedChapters || []);
                 } else {
                     setChapters([]);
                 }
@@ -56,7 +72,7 @@ function StoryDetailScreen({ route, navigation }) {
 
             } catch (err) {
                 console.error("Error fetching chapters or like status:", err);
-                setChapters([]);
+                // setChapters([]);
                 setIsLiked(false);
             } finally {
                 setLoading(false);
@@ -197,7 +213,6 @@ function StoryDetailScreen({ route, navigation }) {
             </View>
         </View>
     );
-
 }
 
 export default StoryDetailScreen;

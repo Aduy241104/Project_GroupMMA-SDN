@@ -6,6 +6,8 @@ import chapterRouter from "./chapter.route.js";
 import likeRouter from "./like.route.js";
 import bookmarkRoute from "./bookmark.route.js";
 import commentRoute from "./comment.route.js";
+import readingHistoryRouter from "./history.route.js";
+
 import { verifyAdmin, verifyTokenMiddleware } from "../middlewares/authMiddleware.js";
 
 function route(app) {
@@ -20,6 +22,7 @@ function route(app) {
     app.use("/api/like", likeRouter);
     app.use("/api/bookmark", bookmarkRoute);
     app.use("/api/comments", commentRoute);
+    app.use("/api/history", readingHistoryRouter)
 
 }
 

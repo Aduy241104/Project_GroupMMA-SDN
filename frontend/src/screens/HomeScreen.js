@@ -9,7 +9,7 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
-import api from "../config/axiosConfig"; // 🔹 import instance axios bạn đã cấu hình
+import api from "../config/axiosConfig";
 import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {
@@ -84,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
             {/* Mới đăng */ }
             <View style={ styles.sectionHeader }>
                 <Text style={ styles.sectionTitle }>Xem nhiều</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={ () => navigation.navigate("mostView") }>
                     <Text style={ styles.moreText }>Xem Thêm ›</Text>
                 </TouchableOpacity>
             </View>
@@ -96,20 +96,6 @@ const HomeScreen = ({ navigation }) => {
                 showsHorizontalScrollIndicator={ false }
             />
 
-            {/* Mới cập nhật */ }
-            <View style={ styles.sectionHeader }>
-                <Text style={ styles.sectionTitle }>Mới cập nhật</Text>
-                <TouchableOpacity>
-                    <Text style={ styles.moreText }>Xem Thêm ›</Text>
-                </TouchableOpacity>
-            </View>
-            <FlatList
-                horizontal
-                data={ data.updatedRecentlyStories }
-                renderItem={ renderStoryItemUpdated }
-                keyExtractor={ (item) => item._id }
-                showsHorizontalScrollIndicator={ false }
-            />
 
             {/* Truyện Full - Hoàn */ }
             <Text style={ styles.sectionTitle }>Truyện Full - Hoàn</Text>
@@ -166,7 +152,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 10,
-        marginTop: 10,
+        marginTop: 30,
     },
     sectionTitle: {
         color: "#fff",
@@ -196,6 +182,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginTop: 15,
         marginBottom: 40,
+        paddingBottom: 100
     },
     fullButton: {
         backgroundColor: "#111",
