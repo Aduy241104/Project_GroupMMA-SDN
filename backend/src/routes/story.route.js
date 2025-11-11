@@ -7,8 +7,11 @@ router.get("/", storyController.getAllStory);
 
 router.get("/home", storyController.getHomeData);
 
+router.get("/most-view", storyController.getMostViewedData);
+
 router.get("/search", storyController.findStory);
 
 router.patch("/update-view/:id", storyController.updateStoryView);
+
 
 export default router;
