@@ -44,6 +44,21 @@ function StoryDetailScreen({ route, navigation }) {
     }, [data._id]);
 
     useEffect(() => {
+
+        const handleSaveHistory = async () => {
+            try {
+                await api.post(`/api/history/update-history/${data._id}`)
+                console.log("Save history");
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        handleSaveHistory();
+    }, [data._id])
+
+    useEffect(() => {
         const fetchChaptersAndLike = async () => {
             setLoading(true);
             try {

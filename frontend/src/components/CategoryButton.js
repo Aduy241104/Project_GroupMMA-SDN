@@ -9,8 +9,8 @@ const icons = {
     "Thịnh Hành": "trending-up",
     "Category": "albums",
     "User": "people",
-    "Comment": "chatbubbles",
-    "Author": "person",
+    "Create Story": "chatbubbles",
+    "Comments": "person",
 };
 
 export default function CategoryButton({ title, onPress }) {
