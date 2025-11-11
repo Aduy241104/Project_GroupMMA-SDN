@@ -1,0 +1,1 @@
+import BookMark from "../models/bookmark.js"

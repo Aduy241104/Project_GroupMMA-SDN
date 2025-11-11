@@ -1,0 +1,1 @@
+import OTP from '../models/otpVerify.js'
