@@ -38,14 +38,29 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
-    const renderStoryItemUpdated = ({ item }) => (
-        <TouchableOpacity style={ styles.storyCard }>
-            <Image source={ { uri: item.storyId.coverImage } } style={ styles.storyImage } />
-            <Text style={ styles.storyTitle } numberOfLines={ 1 }>
-                { item.storyId.title }
+    // const renderStoryItemUpdated = ({ item }) => (
+    //     <TouchableOpacity style={ styles.storyCard }>
+    //         <Image source={ { uri: item.storyId.coverImage } } style={ styles.storyImage } />
+    //         <Text style={ styles.storyTitle } numberOfLines={ 1 }>
+    //             { item.storyId.title }
+    //         </Text>
+    //     </TouchableOpacity>
+    // );
+
+
+     const renderStoryItemUpdated = ({ item }) => {
+    const cover = item.storyId?.coverImage || "https://via.placeholder.com/110x150";
+    const title = item.storyId?.title || "Không có tiêu đề";
+
+    return (
+        <TouchableOpacity style={styles.storyCard}>
+            <Image source={{ uri: cover }} style={styles.storyImage} />
+            <Text style={styles.storyTitle} numberOfLines={1}>
+                {title}
             </Text>
         </TouchableOpacity>
     );
+};
 
     if (!data) {
         return (

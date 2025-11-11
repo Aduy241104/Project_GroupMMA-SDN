@@ -6,7 +6,7 @@ console.log("HOST: ", HOST);
 
 // Tạo instance riêng
 const api = axios.create({
-    baseURL: HOST,
+    baseURL: HOST ,
     timeout: 10000, // 10 giây
     headers: {
         "Content-Type": "application/json",

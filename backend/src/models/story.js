@@ -4,7 +4,7 @@ const storySchema = new mongoose.Schema({
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: String,
-    coverImage: String,
+     coverImage: String ,
     authorId: { type: mongoose.Schema.Types.ObjectId, ref: "Author" },
     categoryIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
     type: { type: String, enum: ["novel", "comic"], required: true },

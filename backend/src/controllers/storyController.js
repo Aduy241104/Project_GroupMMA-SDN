@@ -117,11 +117,164 @@ const updateStoryView = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};
+
+//Admin-them
+
+const createStory = async (req, res, next) => {
+  try {
+    const { title, slug, description, authorId, categoryIds, type, status } = req.body;
+
+    if (type !== "novel") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Only 'novel' type stories can be created by admin",
+      });
+    }
+
+    const newStory = new Story({
+      title,
+      slug,
+      description,
+      authorId,
+      categoryIds,
+      type,
+      status,
+      createdBy: req.user._id, // lấy từ token admin
+    });
+
+    await newStory.save();
+
+    // Populate dữ liệu author và category trước khi trả về
+    const populatedStory = await Story.findById(newStory._id)
+      .populate({ path: "authorId", select: "name bio avatarUrl" })
+      .populate({ path: "categoryIds", select: "name slug description" })
+      .populate({ path: "createdBy", select: "username email" });
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: "Story created successfully",
+      data: populatedStory,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// Lấy chi tiết story theo id
+const getStoryById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const story = await Story.findById(id)
+      .populate({ path: "authorId", select: "name bio avatarUrl" })
+      .populate({ path: "categoryIds", select: "name slug description" })
+      .populate({ path: "createdBy", select: "username email" });
+
+    if (!story) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Get story successfully",
+      data: story,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+//Admin - sua
+
+const updateStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const story = await Story.findById(id);
+
+    if (!story) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    if (story.type !== "novel") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Only 'novel' stories can be updated by admin",
+      });
+    }
+
+    await Story.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+
+    // Populate dữ liệu sau khi update
+    const updatedPopulated = await Story.findById(id)
+      .populate({ path: "authorId", select: "name bio avatarUrl" })
+      .populate({ path: "categoryIds", select: "name slug description" })
+      .populate({ path: "createdBy", select: "username email" });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Story updated successfully",
+      data: updatedPopulated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//Admin - Xoa
+const deleteStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const story = await Story.findById(id);
+
+    if (!story) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    if (story.type !== "novel") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Only 'novel' stories can be deleted by admin",
+      });
+    }
+
+    await Story.findByIdAndDelete(id);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Story deleted successfully",
+      data: {
+        _id: story._id,
+        title: story.title,
+        authorId: story.authorId,
+        categoryIds: story.categoryIds
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 export default {
     getAllStory,
     getHomeData,
     findStory,
-    updateStoryView
+    updateStoryView,
+    getStoryById,
+    createStory, // admin - thêm
+    updateStory, // admin - sửa
+    deleteStory // admin - xóa
 }
