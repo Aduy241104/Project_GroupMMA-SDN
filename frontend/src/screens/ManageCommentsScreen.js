@@ -42,16 +42,12 @@ const ManageCommentsScreen = () => {
         },
       });
 
-      console.log("🔥 API response:", JSON.stringify(res.data, null, 2));
 
       // response chuẩn có thể là res.data.data.comments (tùy backend)
       const commentsData = res.data?.data?.comments || res.data?.comments || [];
       setComments(commentsData);
-      console.log("💬 Comments state:", commentsData);
     } catch (err) {
       console.error(
-        "Error fetching comments:",
-        err.response?.data || err.message
       );
       Alert.alert("Lỗi", "Không thể lấy danh sách comment.");
     } finally {

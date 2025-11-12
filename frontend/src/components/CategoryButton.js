@@ -11,6 +11,7 @@ const icons = {
     "User": "people",
     "Create Story": "chatbubbles",
     "Comments": "person",
+    "Authors": "person-circle",
 };
 
 export default function CategoryButton({ title, onPress }) {

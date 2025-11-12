@@ -40,14 +40,12 @@ const AdminHome = ({ navigation }) => {
           title="Comments"
           onPress={() => navigation.navigate("ManageComments")}
         />
-      </View>
-
-      <View style={styles.filterRow}>
         <CategoryButton
           title="Authors"
-          onPress={() => navigation.navigate("ManageAuthors")} // ← dẫn đến màn hình quản lý tác giả
+          onPress={() => navigation.navigate("ManageAuthors")}
         />
       </View>
+
 
       <AdminScreen navigation={navigation} />
     </View>
@@ -117,7 +115,7 @@ const AdminNavigation = () => {
         options={{ title: "Quản lý Comment" }}
       />
       <Stack.Screen
-        name="ManageAuthors" // ← thêm màn hình ManageAuthors
+        name="ManageAuthors"
         component={ManageAuthorsScreen}
         options={{ title: "Quản lý tác giả" }}
       />

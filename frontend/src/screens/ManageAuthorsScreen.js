@@ -36,10 +36,7 @@ const ManageAuthorsScreen = () => {
           Pragma: "no-cache",
         },
       });
-      // res.data là mảng trực tiếp
       setAuthors(Array.isArray(res) ? res : []);
-      console.log("💡 res:", res);
-      console.log("💡 Authors:", res.data);
     } catch (err) {
       console.error(
         "Error fetching authors:",
