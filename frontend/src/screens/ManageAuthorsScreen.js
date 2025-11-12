@@ -1,3 +1,4 @@
+// screens/ManageAuthorsScreen.js
 import React, { useEffect, useState, useContext } from "react";
 import {
   View,
@@ -10,9 +11,10 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import api from "../config/axiosConfig.js";
 import { AuthContext } from "../context/AuthContext";
-import { Image } from "react-native";
 
 const ManageAuthorsScreen = () => {
   const { token, loading: authLoading, user } = useContext(AuthContext);
@@ -38,16 +40,9 @@ const ManageAuthorsScreen = () => {
       });
       setAuthors(Array.isArray(res) ? res : []);
     } catch (err) {
-      console.error(
-        "Error fetching authors:",
-        err.response?.data || err.message
-      );
-
+      console.error("Error fetching authors:", err.response?.data || err.message);
       if (err.response?.status === 401 || err.response?.status === 403) {
-        Alert.alert(
-          "Phiên hết hạn",
-          "Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn."
-        );
+        Alert.alert("Phiên hết hạn", "Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn.");
       } else {
         Alert.alert("Lỗi", "Không thể lấy danh sách tác giả.");
       }
@@ -59,6 +54,14 @@ const ManageAuthorsScreen = () => {
   useEffect(() => {
     if (!authLoading && token) fetchAuthors();
   }, [token, authLoading]);
+
+  const openEditModal = (author) => {
+    setEditingAuthor(author);
+    setEditName(author.name);
+    setEditBio(author.bio || "");
+    setEditAvatarUrl(author.avatarUrl || "");
+    setModalVisible(true);
+  };
 
   const handleDelete = (authorId) => {
     Alert.alert("Xác nhận", "Bạn có chắc muốn xóa tác giả này?", [
@@ -73,10 +76,7 @@ const ManageAuthorsScreen = () => {
             });
             setAuthors((prev) => prev.filter((a) => a._id !== authorId));
           } catch (err) {
-            console.error(
-              "Error deleting author:",
-              err.response?.data || err.message
-            );
+            console.error("Error deleting author:", err.response?.data || err.message);
             Alert.alert("Lỗi", "Không thể xóa tác giả.");
           }
         },
@@ -84,7 +84,6 @@ const ManageAuthorsScreen = () => {
     ]);
   };
 
-  // Lưu chỉnh sửa
   const saveEdit = async () => {
     if (!editingAuthor) return;
     try {
@@ -108,10 +107,7 @@ const ManageAuthorsScreen = () => {
       setEditBio("");
       setEditAvatarUrl("");
     } catch (err) {
-      console.error(
-        "Error updating author:",
-        err.response?.data || err.message
-      );
+      console.error("Error updating author:", err.response?.data || err.message);
       Alert.alert("Lỗi", "Không thể chỉnh sửa tác giả.");
     }
   };
@@ -119,16 +115,15 @@ const ManageAuthorsScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#00bfff" />
       </View>
     );
   }
+
   if (!user || user.role !== "admin") {
     return (
       <View style={styles.centered}>
-        <Text style={styles.permissionText}>
-          Bạn không có quyền truy cập trang này.
-        </Text>
+        <Text style={styles.permissionText}>Bạn không có quyền truy cập trang này.</Text>
       </View>
     );
   }
@@ -150,29 +145,31 @@ const ManageAuthorsScreen = () => {
 
             <View style={styles.textContainer}>
               <Text style={styles.text}>ID: {item._id}</Text>
-              <Text style={styles.text}>Name: {item.name}</Text>
+              <Text style={styles.text}>Tên: {item.name}</Text>
               <Text style={styles.text}>Bio: {item.bio || "Chưa có"}</Text>
-              <Text style={styles.text}>Created At: {item.createdAt}</Text>
-              <Text style={styles.text}>Updated At: {item.updatedAt}</Text>
+              <Text style={styles.text}>Tạo lúc: {item.createdAt}</Text>
+              <Text style={styles.text}>Cập nhật: {item.updatedAt}</Text>
 
-              <View style={styles.actionRow}>
+              <View style={styles.actionsRow}>
                 <TouchableOpacity
-                  style={styles.actionBtn}
+                  style={[styles.actionButton, styles.editButton]}
                   onPress={() => openEditModal(item)}
                 >
-                  <Text style={styles.actionText}>Edit</Text>
+                  <Ionicons name="create-outline" size={16} color="#fff" />
+                  <Text style={styles.actionText}>Sửa</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
-                  style={[styles.actionBtn, { backgroundColor: "#ff4040" }]}
+                  style={[styles.actionButton, styles.deleteButton]}
                   onPress={() => handleDelete(item._id)}
                 >
-                  <Text style={styles.actionText}>Delete</Text>
+                  <Ionicons name="trash-outline" size={16} color="#fff" />
+                  <Text style={styles.actionText}>Xóa</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         )}
-        s
         ListEmptyComponent={
           <View style={styles.center}>
             <Text style={styles.text}>Không có tác giả nào.</Text>
@@ -188,9 +185,8 @@ const ManageAuthorsScreen = () => {
       >
         <View style={styles.modalBg}>
           <View style={styles.modalContainer}>
-            <Text style={[styles.modalTitle, { color: "#00bfff" }]}>
-              Chỉnh sửa tác giả
-            </Text>
+            <Text style={[styles.modalTitle, { color: "#00bfff" }]}>Chỉnh sửa tác giả</Text>
+
             <TextInput
               style={styles.input}
               value={editName}
@@ -213,20 +209,21 @@ const ManageAuthorsScreen = () => {
               placeholder="Avatar URL"
               placeholderTextColor="#888"
             />
+
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={[styles.actionBtn, { flex: 1 }]}
+                style={[styles.actionButton, styles.cancelButton]}
                 onPress={() => setModalVisible(false)}
               >
+                <Ionicons name="close-outline" size={16} color="#fff" />
                 <Text style={styles.actionText}>Hủy</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
-                style={[
-                  styles.actionBtn,
-                  { flex: 1, backgroundColor: "#00bfff" },
-                ]}
+                style={[styles.actionButton, styles.saveButton]}
                 onPress={saveEdit}
               >
+                <Ionicons name="checkmark-outline" size={16} color="#fff" />
                 <Text style={styles.actionText}>Lưu</Text>
               </TouchableOpacity>
             </View>
@@ -242,28 +239,44 @@ export default ManageAuthorsScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#000" },
   item: {
-    flexDirection: "row", // xếp theo hàng
-    alignItems: "center", // căn giữa theo chiều dọc
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: "#222",
+    flexDirection: "row",
+    alignItems: "flex-start",
     backgroundColor: "#111",
-    borderRadius: 6,
-    marginBottom: 8,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
   },
   avatar: {
     width: 80,
     height: 80,
+    borderRadius: 8,
   },
-  textContainer: {
-    flex: 1, // chiếm phần còn lại
-    marginLeft: 12, // cách ảnh
-  },
-  actionRow: {
+  textContainer: { flex: 1, marginLeft: 12 },
+  text: { color: "#fff", marginBottom: 2 },
+  actionsRow: {
     flexDirection: "row",
-    marginTop: 8,
+    justifyContent: "space-between",
+    marginTop: 12,
   },
-
+  actionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  editButton: { backgroundColor: "#34495e" },
+  deleteButton: { backgroundColor: "#c0392b" },
+  cancelButton: { backgroundColor: "#333" },
+  saveButton: { backgroundColor: "#27ae60" },
+  actionText: {
+    color: "#fff",
+    marginLeft: 4,
+    fontWeight: "600",
+    fontSize: 13,
+  },
   centered: {
     flex: 1,
     backgroundColor: "#000",
@@ -271,44 +284,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 20,
   },
-  permissionText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  text: { color: "#fff", marginBottom: 2 },
-  actionRow: { flexDirection: "row", marginTop: 8 },
-  actionBtn: {
-    backgroundColor: "#00bfff",
-    padding: 8,
-    marginRight: 8,
-    borderRadius: 4,
-    alignItems: "center",
-  },
-  actionText: { color: "#fff", fontWeight: "bold" },
+  permissionText: { color: "#fff", fontSize: 16, textAlign: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
   modalBg: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.7)",
     justifyContent: "center",
     padding: 20,
   },
-  modalContainer: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    padding: 16,
-  },
+  modalContainer: { backgroundColor: "#111", borderRadius: 12, padding: 16 },
   modalTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 12 },
   input: {
     borderWidth: 1,
-    borderColor: "#00bfff",
-    borderRadius: 6,
+    borderColor: "#07c3e9ff",
+    borderRadius: 8,
     padding: 10,
-    minHeight: 40,
+    minHeight: 60,
     textAlignVertical: "top",
     marginBottom: 12,
     color: "#fff",
   },
-  modalActions: { flexDirection: "row", justifyContent: "space-between" },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 });
