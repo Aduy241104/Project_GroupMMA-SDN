@@ -1,46 +1,55 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CategoryButton from "../components/CategoryButton";
+
 import ListUserScreen from "../screens/ListUserScreen";
 import AddUserScreen from "../screens/AddUserScreen";
 import EditUserScreen from "../screens/EditUserScreen";
-import ManageCommentsScreen from "../screens/ManageCommentsScreen.js";
+import AdminScreen from "../screens/AdminScreen";
+import AdminStoryDetailScreen from "../screens/AdminStoryDetailScreen";
+import UpdateStoryScreen from "../screens/UpdateStoryScreen";
+import CreateStoryScreen from "../screens/CreateStoryScreen";
+import CreateChapterScreen from "../screens/CreateChapterScreen";
+import UpdateChapterScreen from "../screens/UpdateChapterScreen";
+import CatelogyScreen from "../screens/CatelogyScreen";
+import ManageCommentsScreen from "../screens/ManageCommentsScreen";
 import ManageAuthorsScreen from "../screens/ManageAuthorsScreen";
 
 const Stack = createNativeStackNavigator();
 
-// Màn hình Admin Home inline: 4 nút Category, User, Comment, Author
 const AdminHome = ({ navigation }) => {
-  const onComing = () => Alert.alert("Thông báo", "Tính năng sẽ sớm có.");
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Admin page</Text>
+      <Text style={styles.headerTitle}>Admin Page</Text>
 
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        {["Category", "User", "Comment", "Author"].map((title) => (
-          <CategoryButton
-            key={title}
-            title={title}
-            onPress={
-              title === "User"
-                ? () => navigation.navigate("ListUser")
-                : title === "Comment"
-                ? () => navigation.navigate("ManageComments")
-                : title === "Author"
-                ? () => navigation.navigate("ManageAuthors")
-                : onComing
-            }
-          />
-        ))}
+      <View style={styles.filterRow}>
+        <CategoryButton
+          title="Category"
+          onPress={() => navigation.navigate("CategoryManagement")}
+        />
+        <CategoryButton
+          title="Create Story"
+          onPress={() => navigation.navigate("CreateStory")}
+        />
+        <CategoryButton
+          title="User"
+          onPress={() => navigation.navigate("ListUser")}
+        />
+        <CategoryButton
+          title="Comments"
+          onPress={() => navigation.navigate("ManageComments")}
+        />
       </View>
+
+      <View style={styles.filterRow}>
+        <CategoryButton
+          title="Authors"
+          onPress={() => navigation.navigate("ManageAuthors")} // ← dẫn đến màn hình quản lý tác giả
+        />
+      </View>
+
+      <AdminScreen navigation={navigation} />
     </View>
   );
 };
@@ -59,6 +68,33 @@ const AdminNavigation = () => {
         name="AdminHome"
         component={AdminHome}
         options={{ title: "Admin page" }}
+      />
+      <Stack.Screen name="main Admin" component={AdminScreen} />
+      <Stack.Screen name="adminDetail" component={AdminStoryDetailScreen} />
+      <Stack.Screen
+        name="UpdateStory"
+        component={UpdateStoryScreen}
+        options={{ title: "Sửa truyện" }}
+      />
+      <Stack.Screen
+        name="CreateStory"
+        component={CreateStoryScreen}
+        options={{ title: "Thêm truyện mới" }}
+      />
+      <Stack.Screen
+        name="CreateChapter"
+        component={CreateChapterScreen}
+        options={{ title: "Thêm chương mới" }}
+      />
+      <Stack.Screen
+        name="UpdateChapter"
+        component={UpdateChapterScreen}
+        options={{ title: "Sửa chương" }}
+      />
+      <Stack.Screen
+        name="CategoryManagement"
+        component={CatelogyScreen}
+        options={{ title: "Quản lý Thể loại" }}
       />
       <Stack.Screen
         name="ListUser"
@@ -81,7 +117,7 @@ const AdminNavigation = () => {
         options={{ title: "Quản lý Comment" }}
       />
       <Stack.Screen
-        name="ManageAuthors"
+        name="ManageAuthors" // ← thêm màn hình ManageAuthors
         component={ManageAuthorsScreen}
         options={{ title: "Quản lý tác giả" }}
       />
@@ -93,39 +129,21 @@ export default AdminNavigation;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#000",
-    padding: 16,
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingTop: 40,
   },
-  title: {
+  headerTitle: {
     color: "#fff",
     fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 16,
+    fontWeight: "bold",
     alignSelf: "center",
+    marginBottom: 20,
   },
-  grid: {
+  filterRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-between",
-  },
-  card: {
-    width: "48%",
-    backgroundColor: "#111",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#1f1f1f",
-  },
-  cardTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 6,
-  },
-  cardDesc: {
-    color: "#bbb",
-    fontSize: 13,
+    marginBottom: 20,
   },
 });

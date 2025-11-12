@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 import LoginScreen from "./src/screens/LoginScreen";
 import StoryDetailScreen from "./src/screens/StoryDetailScreen";
 import ReadStoryScreen from "./src/screens/ReadStoryScreen";
+import AdminScreen from "./src/screens/AdminScreen";
 import CommentScreen from "./src/screens/CommentScreen";
 import RegisterScreen from "./src/screens/RegisterScreen"
 import VerifyOTPScreen from './src/screens/VerifyOTPScreen';
@@ -18,8 +19,6 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-
-  
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -32,6 +31,7 @@ export default function App() {
           <Stack.Screen name="login" component={ LoginScreen } />
           <Stack.Screen name="detail" component={ StoryDetailScreen } />
           <Stack.Screen name="read" component={ ReadStoryScreen } />
+          <Stack.Screen name="admin" component={ AdminScreen } />
           <Stack.Screen name="comment" component={CommentScreen} /> 
           <Stack.Screen name="register" component={ RegisterScreen } />
           <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />

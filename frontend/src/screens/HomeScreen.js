@@ -9,7 +9,7 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
-import api from "../config/axiosConfig";
+import axios from "../config/axiosConfig";
 import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {
@@ -19,13 +19,12 @@ const HomeScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const res = await api.get("/api/stories/home");
+                const res = await axios.get("/api/stories/home");
                 setData(res.data);
             } catch (err) {
                 console.error("Fetch home data error:", err);
             }
         };
-
         fetchHomeData();
     }, [isFocus]);
 
@@ -38,15 +37,7 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
-    const renderStoryItemUpdated = ({ item }) => (
-        <TouchableOpacity style={ styles.storyCard }>
-            <Image source={ { uri: item.storyId.coverImage } } style={ styles.storyImage } />
-            <Text style={ styles.storyTitle } numberOfLines={ 1 }>
-                { item.storyId.title }
-            </Text>
-        </TouchableOpacity>
-    );
-
+  
     if (!data) {
         return (
             <View style={ styles.loadingContainer }>
@@ -60,8 +51,8 @@ const HomeScreen = ({ navigation }) => {
             {/* Header */ }
             <Text style={ styles.headerTitle }>TYT</Text>
 
-            <View style={ { flex: 1, flexDirection: "row", justifyContent: "space-between" } }>
-                { ["Đánh Giá", "Yêu Thích", "Xem Nhiều", "Thịnh Hành"].map((title) => (
+            <View style={ { flex: 1, flexDirection: "row", justifyContent: "flex-start" } }>
+                { ["Xem Nhiều", "Thịnh Hành"].map((title) => (
                     <CategoryButton key={ title } title={ title } />
                 )) }
             </View>

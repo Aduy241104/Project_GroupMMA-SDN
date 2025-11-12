@@ -10,23 +10,11 @@ function StoryDetailScreen({ route, navigation }) {
     const { data } = route.params;
     const { token } = useContext(AuthContext);
     const [chapters, setChapters] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const isFocus = useIsFocused();
 
-    const fetchBookmarkStatus = async (storyId) => {
-        if (!token) return;
-        try {
-            const res = await api.get(`/api/bookmark/check?storyId=${storyId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setIsBookmarked(res?.data?.bookmarked ?? false);
-        } catch (err) {
-            console.error("Lỗi khi fetch bookmark:", err);
-            setIsBookmarked(false);
-        }
-    };
 
     useEffect(() => {
         if (token) {
@@ -42,6 +30,7 @@ function StoryDetailScreen({ route, navigation }) {
             handleSaveHistory();
         }
     }, [data._id]);
+
 
     useEffect(() => {
         const fetchChaptersAndLike = async () => {
@@ -83,6 +72,7 @@ function StoryDetailScreen({ route, navigation }) {
     }, [data._id, isFocus]);
 
 
+    // call api like or unlike
     const handleLikeToggle = async () => {
 
         if (!token) {
@@ -132,7 +122,6 @@ function StoryDetailScreen({ route, navigation }) {
     };
 
     const handleCommentPress = () => {
-    
         navigation.navigate("comment", { storyId: data._id });
     };
 

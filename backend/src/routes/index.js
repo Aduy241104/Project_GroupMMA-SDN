@@ -4,6 +4,8 @@ import storyRoute from "./story.route.js";
 import userRouter from './user.route.js';
 import chapterRouter from "./chapter.route.js";
 import likeRouter from "./like.route.js";
+import categoryRouter from "./category.route.js"
+import authorRouter from "./author.route.js";
 import bookmarkRoute from "./bookmark.route.js";
 import commentRoute from "./comment.route.js";
 import readingHistoryRouter from "./history.route.js";
@@ -21,6 +23,9 @@ function route(app) {
     app.use("/api/stories", storyRoute);
     app.use("/api/chapters", chapterRouter);
     app.use("/api/like", likeRouter);
+    
+    app.use("/api/categories", categoryRouter);
+    app.use("/api/authors", authorRouter);
     app.use("/api/bookmark", bookmarkRoute);
     app.use("/api/comments", commentRoute);
     app.use("/api/history", readingHistoryRouter)
