@@ -6,6 +6,7 @@ import ListUserScreen from "../screens/ListUserScreen";
 import AddUserScreen from "../screens/AddUserScreen";
 import EditUserScreen from "../screens/EditUserScreen";
 import ManageCommentsScreen from "../screens/ManageCommentsScreen.js";
+import ManageAuthorsScreen from "../screens/ManageAuthorsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,8 @@ const AdminHome = ({ navigation }) => {
                 ? () => navigation.navigate("ListUser")
                 : title === "Comment"
                 ? () => navigation.navigate("ManageComments")
+                : title === "Author"
+                ? () => navigation.navigate("ManageAuthors")
                 : onComing
             }
           />
@@ -76,6 +79,11 @@ const AdminNavigation = () => {
         name="ManageComments"
         component={ManageCommentsScreen}
         options={{ title: "Quản lý Comment" }}
+      />
+      <Stack.Screen
+        name="ManageAuthors"
+        component={ManageAuthorsScreen}
+        options={{ title: "Quản lý tác giả" }}
       />
     </Stack.Navigator>
   );
