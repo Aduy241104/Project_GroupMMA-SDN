@@ -60,7 +60,6 @@ const ManageAuthorsScreen = () => {
     if (!authLoading && token) fetchAuthors();
   }, [token, authLoading]);
 
-  // Xóa tác giả
   const handleDelete = (authorId) => {
     Alert.alert("Xác nhận", "Bạn có chắc muốn xóa tác giả này?", [
       { text: "Hủy", style: "cancel" },
@@ -69,7 +68,7 @@ const ManageAuthorsScreen = () => {
         style: "destructive",
         onPress: async () => {
           try {
-            await api.delete(`/api/authors/${authorId}`, {
+            await api.delete(`/api/admin/author/${authorId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             setAuthors((prev) => prev.filter((a) => a._id !== authorId));
@@ -85,21 +84,12 @@ const ManageAuthorsScreen = () => {
     ]);
   };
 
-  // Mở modal chỉnh sửa
-  const openEditModal = (author) => {
-    setEditingAuthor(author);
-    setEditName(author.name);
-    setEditBio(author.bio || "");
-    setEditAvatarUrl(author.avatarUrl || "");
-    setModalVisible(true);
-  };
-
   // Lưu chỉnh sửa
   const saveEdit = async () => {
     if (!editingAuthor) return;
     try {
       await api.put(
-        `/api/authors/${editingAuthor._id}`,
+        `/api/admin/author/${editingAuthor._id}`,
         { name: editName, bio: editBio, avatarUrl: editAvatarUrl },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -181,7 +171,8 @@ const ManageAuthorsScreen = () => {
               </View>
             </View>
           </View>
-        )}s
+        )}
+        s
         ListEmptyComponent={
           <View style={styles.center}>
             <Text style={styles.text}>Không có tác giả nào.</Text>
