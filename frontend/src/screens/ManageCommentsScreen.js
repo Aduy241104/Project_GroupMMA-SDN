@@ -15,7 +15,7 @@ import { AuthContext } from "../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ManageCommentsScreen = () => {
-  const { token, loading: authLoading } = useContext(AuthContext);
+  const { token, loading: authLoading, user } = useContext(AuthContext);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,17 +42,12 @@ const ManageCommentsScreen = () => {
         },
       });
 
-      console.log("🔥 API response:", JSON.stringify(res.data, null, 2));
 
       // response chuẩn có thể là res.data.data.comments (tùy backend)
-      const commentsData =
-        res.data?.data?.comments || res.data?.comments || [];
+      const commentsData = res.data?.data?.comments || res.data?.comments || [];
       setComments(commentsData);
-      console.log("💬 Comments state:", commentsData);
     } catch (err) {
       console.error(
-        "Error fetching comments:",
-        err.response?.data || err.message
       );
       Alert.alert("Lỗi", "Không thể lấy danh sách comment.");
     } finally {
@@ -92,6 +87,15 @@ const ManageCommentsScreen = () => {
       },
     ]);
   };
+  if (!user || user.role !== "admin") {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.permissionText}>
+          Bạn không có quyền truy cập trang này.
+        </Text>
+      </View>
+    );
+  }
 
   // ✅ Sửa endpoint update
   const openEditModal = (comment) => {
@@ -134,7 +138,7 @@ const ManageCommentsScreen = () => {
     );
   }
 
-return (
+  return (
     <View style={styles.container}>
       <FlatList
         data={comments}
@@ -200,7 +204,10 @@ return (
                 <Text style={styles.actionText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionBtn, { flex: 1, backgroundColor: "#00bfff" }]}
+                style={[
+                  styles.actionBtn,
+                  { flex: 1, backgroundColor: "#00bfff" },
+                ]}
                 onPress={saveEdit}
               >
                 <Text style={styles.actionText}>Lưu</Text>
@@ -224,6 +231,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#111",
     borderRadius: 6,
     marginBottom: 8,
+  },
+  centered: {
+    flex: 1,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  permissionText: {
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
   },
   text: { color: "#fff", marginBottom: 2 },
   actionRow: { flexDirection: "row", marginTop: 8 },

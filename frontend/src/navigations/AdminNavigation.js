@@ -14,13 +14,11 @@ import CreateChapterScreen from "../screens/CreateChapterScreen";
 import UpdateChapterScreen from "../screens/UpdateChapterScreen";
 import CatelogyScreen from "../screens/CatelogyScreen";
 import ManageCommentsScreen from "../screens/ManageCommentsScreen";
+import ManageAuthorsScreen from "../screens/ManageAuthorsScreen";
 
 const Stack = createNativeStackNavigator();
 
-// AdminHome: các nút điều hướng nhanh
 const AdminHome = ({ navigation }) => {
-  const onComing = () => Alert.alert("Thông báo", "Tính năng sẽ sớm có.");
-
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Admin Page</Text>
@@ -34,21 +32,20 @@ const AdminHome = ({ navigation }) => {
           title="Create Story"
           onPress={() => navigation.navigate("CreateStory")}
         />
-        
         <CategoryButton
           title="User"
           onPress={() => navigation.navigate("ListUser")}
         />
-
         <CategoryButton
           title="Comments"
           onPress={() => navigation.navigate("ManageComments")}
         />
+        <CategoryButton
+          title="Authors"
+          onPress={() => navigation.navigate("ManageAuthors")}
+        />
       </View>
 
-      <View style={styles.filterRow}>
-        <CategoryButton title="Authors" onPress={onComing} />
-      </View>
 
       <AdminScreen navigation={navigation} />
     </View>
@@ -87,13 +84,6 @@ const AdminNavigation = () => {
         component={CreateChapterScreen}
         options={{ title: "Thêm chương mới" }}
       />
-
-      <Stack.Screen
-        name="ManageComments"
-        component={ManageCommentsScreen}
-        options={{ title: "Quản lý Comment" }}
-      />
-
       <Stack.Screen
         name="UpdateChapter"
         component={UpdateChapterScreen}
@@ -119,7 +109,16 @@ const AdminNavigation = () => {
         component={EditUserScreen}
         options={{ title: "Chỉnh sửa người dùng" }}
       />
-      
+      <Stack.Screen
+        name="ManageComments"
+        component={ManageCommentsScreen}
+        options={{ title: "Quản lý Comment" }}
+      />
+      <Stack.Screen
+        name="ManageAuthors"
+        component={ManageAuthorsScreen}
+        options={{ title: "Quản lý tác giả" }}
+      />
     </Stack.Navigator>
   );
 };
